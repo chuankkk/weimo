@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="icon-title icon-desc">
+  <title id="icon-title">闱墨</title>
+  <desc id="icon-desc">宣纸底色上的门形卷页标志，配玄墨、黛青与朱砂色。</desc>
+
+  <defs>
+    <clipPath id="paper-shape">
+      <rect x="18" y="18" width="476" height="476" rx="118" />
+    </clipPath>
+  </defs>
+
+  <rect x="18" y="18" width="476" height="476" rx="118" fill="#F2EBDD" />
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="none" stroke="#D8CCB8" stroke-width="4" />
+  <g clip-path="url(#paper-shape)">
+    <path fill="#304B46" opacity="0.055" d="M24 322C119 271 167 290 249 337C322 379 392 382 488 334V512H0V322Z" />
+    <path fill="#A84434" opacity="0.038" d="M0 0H272C217 70 159 89 96 84C56 81 24 69 0 48V0Z" />
+  </g>
+
+  <path fill="#18211F" d="M98 102C98 82.12 114.12 66 134 66H378C397.88 66 414 82.12 414 102V430H340V164H172V430H98V102Z" />
+  <path fill="#304B46" d="M98 146H172V430H126C110.54 430 98 417.46 98 402V146ZM340 164H414V402C414 417.46 401.46 430 386 430H340V164Z" />
+  <path fill="#273B37" d="M128 66H384C400.57 66 414 79.43 414 96V120H98V96C98 79.43 111.43 66 128 66Z" />
+
+  <path fill="#F4EFE3" d="M174 150H314C329.46 150 342 162.54 342 178V316L284 378H202C186.54 378 174 365.46 174 350V150Z" />
+  <path fill="#DCCFBA" d="M284 378V340C284 326.75 294.75 316 308 316H342L284 378Z" />
+  <path fill="#B9AA91" d="M284 340C284 326.75 294.75 316 308 316H342L334.5 324H309C299.61 324 292 331.61 292 341V369.5L284 378V340Z" opacity="0.72" />
+
+  <path fill="none" stroke="#304B46" stroke-width="14" stroke-linecap="round" d="M216 214H304M212 254H294M204 296H312M258 198V332" />
+  <path fill="none" stroke="#A89B84" stroke-width="5" stroke-linecap="round" d="M208 344H262" opacity="0.72" />
+
+  <circle cx="386" cy="104" r="29" fill="#A84434" />
+  <circle cx="378" cy="96" r="7" fill="#C86A55" opacity="0.9" />
+</svg>

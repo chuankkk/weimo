@@ -1,0 +1,27 @@
+{
+  "name": "闱墨 · 本地题库与刷题",
+  "short_name": "闱墨",
+  "description": "本地优先的题库管理、错题复习、笔记与模拟考试应用。",
+  "lang": "zh-CN",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f0e6",
+  "theme_color": "#1c1f1c",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/assets/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

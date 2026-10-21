@@ -1,0 +1,246 @@
+/* ============================================================
+   错题本
+   ============================================================ */
+.wrong-toolbar {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.wrong-filters {
+  display: flex;
+  gap: 8px;
+}
+
+.wrong-filters > select {
+  width: 145px;
+  min-height: 42px;
+  flex: 0 0 auto;
+  font-size: 12px;
+}
+
+.wrong-filters .search-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.wrong-count-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 4px 0 10px;
+  color: var(--ink-3);
+  font-size: 11px;
+}
+
+.wrong-count-line > div {
+  display: flex;
+  gap: 2px;
+}
+
+.wrong-list {
+  display: grid;
+  gap: 9px;
+}
+
+.wrong-card {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--sheet);
+}
+
+.wrong-card.is-due {
+  border-color: color-mix(in srgb, var(--cinnabar) 34%, var(--line));
+  box-shadow: inset 3px 0 0 var(--cinnabar);
+}
+
+.wrong-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.wrong-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-3);
+  font-size: 10px;
+}
+
+.due-badge {
+  padding: 2px 6px;
+  border: 1px solid color-mix(in srgb, var(--cinnabar) 38%, var(--line));
+  border-radius: 4px;
+  background: var(--cinnabar-soft);
+  color: var(--cinnabar);
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.wrong-mastery {
+  display: flex;
+  gap: 3px;
+  flex: 0 0 auto;
+}
+
+.wrong-mastery i {
+  width: 4px;
+  height: 12px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--line-strong) 60%, transparent);
+}
+
+.wrong-mastery i.on {
+  background: color-mix(in srgb, var(--jade) 72%, transparent);
+}
+
+.wrong-card h3 {
+  margin: 9px 0;
+  font-size: 14.5px;
+  font-weight: 560;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.wrong-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.wrong-stats span {
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--paper-2);
+  color: var(--ink-3);
+  font-size: 9.5px;
+}
+
+.wrong-progress {
+  max-width: 190px;
+  margin-top: 9px;
+}
+
+.wrong-answer {
+  margin-top: 11px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--paper-2);
+  animation: fade-in 200ms var(--ease) both;
+}
+
+.wrong-answer-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--line-strong);
+}
+
+.wrong-answer-head strong {
+  color: var(--ink-3);
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+.wrong-answer-head span {
+  color: var(--success);
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.wrong-options {
+  display: grid;
+  gap: 3px;
+  margin-top: 8px;
+}
+
+.wrong-options li {
+  padding: 3px 6px;
+  border-radius: 4px;
+  color: var(--ink-3);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.wrong-options li b {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-size: 9px;
+}
+
+.wrong-options li.is-correct {
+  background: color-mix(in srgb, var(--success) 8%, transparent);
+  color: var(--success);
+}
+
+.wrong-options li.is-correct b {
+  border-color: var(--success);
+}
+
+.wrong-answer > p {
+  margin-top: 8px;
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+
+.wrong-answer > p b {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.wrong-points {
+  color: var(--ink-3);
+  font-size: 10px !important;
+}
+
+.wrong-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.wrong-actions .btn {
+  min-height: 32px;
+  padding-inline: 9px;
+  font-size: 11px;
+}
+
+.wrong-actions .btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.load-more {
+  margin-top: 12px;
+}
+
+.load-more .btn {
+  min-height: 42px;
+}
+
+.load-more-done {
+  margin-top: 12px;
+  color: var(--ink-3);
+  font-size: 10px;
+  text-align: center;
+}
+

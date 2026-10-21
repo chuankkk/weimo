@@ -1,0 +1,39 @@
+# Dependencies and build output
+node_modules/
+dist/
+*.log
+.DS_Store
+Thumbs.db
+
+# Local generated artifacts (APKs, screenshots, exports)
+artifacts/
+test-home.png
+*.apk
+*.aab
+
+# Android local configuration and build output
+android/local.properties
+android/keystore.properties
+android/signing/
+android/.gradle/
+android/.kotlin/
+android/build/
+android/app/build/
+android/capacitor-cordova-android-plugins/build/
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+
+# Signing material — never commit
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.key
+*.pem
+
+# IDE / local env
+.idea/
+.vscode/
+.env.local
+.env.*.local

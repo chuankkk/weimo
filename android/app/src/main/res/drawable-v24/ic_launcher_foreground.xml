@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 66dp 安全区内的闱墨门卷标志；自适应裁切不会伤及主体。 -->
+    <path
+        android:fillColor="#18211F"
+        android:pathData="M30,29C30,25.69 32.69,23 36,23H72C75.31,23 78,25.69 78,29V82H67V40H41V82H30V29Z" />
+    <path
+        android:fillColor="#304B46"
+        android:pathData="M30,38H41V82H34C31.79,82 30,80.21 30,78V38ZM67,40H78V78C78,80.21 76.21,82 74,82H67V40Z" />
+    <path
+        android:fillColor="#F4EFE3"
+        android:pathData="M41.5,38H61.5C64.54,38 67,40.46 67,43.5V65L57,75.5H46C43.51,75.5 41.5,73.49 41.5,71V38Z" />
+    <path
+        android:fillColor="#DCCFBA"
+        android:pathData="M57,75.5V68.5C57,66.57 58.57,65 60.5,65H67L57,75.5Z" />
+    <path
+        android:fillColor="#304B46"
+        android:pathData="M47,47h14v2h-14zM46,54h14v2h-14zM45,61h17v2h-17zM53,44h2v22h-2z" />
+    <path
+        android:fillColor="#A84434"
+        android:pathData="M70,25a5,5 0,1 0,10 0a5,5 0,1 0,-10 0" />
+</vector>

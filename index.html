@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f5f0e6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121513" media="(prefers-color-scheme: dark)" />
+    <meta name="description" content="闱墨——本地优先的题库管理与沉浸式刷题应用，支持题库导入、错题复习、笔记与模拟考试。" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="闱墨" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="icon" type="image/png" href="/assets/app-icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/app-icon-192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link
+      rel="preload"
+      as="image"
+      href="/assets/weimo-ink-hero-1200.jpg"
+      imagesrcset="/assets/weimo-ink-hero-1200.jpg 1200w, /assets/weimo-ink-hero.jpg 1672w"
+      imagesizes="(min-width: 1100px) 560px, (min-width: 760px) 66vw, 100vw"
+      fetchpriority="high"
+    />
+    <title>闱墨 · 本地题库与刷题</title>
+    <script>
+      // 在 React 挂载前恢复主题。只做一次正则读取，避免为取一个字段解析整份题库。
+      (function () {
+        try {
+          var raw = localStorage.getItem("shuati-wang-state-v1") || "";
+          var match = raw.match(/"theme"\s*:\s*"(light|dark|system)"/);
+          var mode = match ? match[1] : "system";
+          var dark =
+            mode === "dark" ||
+            (mode !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          var theme = dark ? "dark" : "light";
+          document.documentElement.dataset.theme = theme;
+          document.documentElement.style.colorScheme = theme;
+        } catch (error) {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

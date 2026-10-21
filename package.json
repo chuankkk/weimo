@@ -1,0 +1,40 @@
+{
+  "name": "weimo",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc && vite build",
+    "build:empty": "tsc && vite build --mode empty",
+    "preview": "vite preview --host 0.0.0.0",
+    "android:sync": "npm run build && cap sync android",
+    "android:sync:empty": "npm run build:empty && cap sync android",
+    "android:open": "npm run android:sync && cap open android",
+    "android:debug": "npm run android:sync && cd android && .\\gradlew.bat assembleDebug",
+    "android:release": "npm run android:sync && cd android && .\\gradlew.bat assembleRelease",
+    "android:debug:empty": "npm run android:sync:empty && cd android && .\\gradlew.bat assembleDebug",
+    "android:release:empty": "npm run android:sync:empty && cd android && .\\gradlew.bat assembleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/cli": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
+    "@capacitor/filesystem": "^8.1.2",
+    "@capacitor/share": "^8.0.1",
+    "@fontsource-variable/noto-sans-sc": "^5.2.10",
+    "@fontsource-variable/noto-serif-sc": "^5.2.10",
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "read-excel-file": "^9.2.0",
+    "write-excel-file": "^4.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^6.0.2",
+    "typescript": "^5.7.2",
+    "vite": "^8.0.16"
+  }
+}

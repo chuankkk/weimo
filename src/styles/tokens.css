@@ -1,0 +1,121 @@
+/*
+ * 闱墨 · 设计令牌
+ * 宣纸为底，玄墨成文，黛青交互，朱砂点睛。
+ */
+
+:root {
+  color-scheme: light;
+  --font-sans: "Noto Sans SC Variable", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-serif: "Noto Serif SC Variable", "Noto Serif SC", "Songti SC", "STSong", serif;
+
+  --paper: #f5f0e6;
+  --paper-2: #eee7da;
+  --sheet: #fbf8f1;
+  --sheet-raised: #fffdf8;
+  --ink: #1c1f1c;
+  --ink-2: #3e453f;
+  --ink-3: #6d736c;
+  --line: #ded5c6;
+  --line-strong: #c8bdab;
+
+  --jade: #2c4b43;
+  --jade-strong: #1e3932;
+  --jade-soft: #e3eae4;
+  --jade-tint: color-mix(in srgb, #2c4b43 8%, transparent);
+  --on-jade: #fbf8f1;
+
+  --cinnabar: #a8463a;
+  --cinnabar-strong: #8d382e;
+  --cinnabar-soft: color-mix(in srgb, #a8463a 10%, transparent);
+  --cinnabar-solid: #a8463a;
+  --on-cinnabar: #fffaf5;
+  --on-cinnabar-solid: #fffaf5;
+
+  --gold: #86662f;
+  --blue: #455d73;
+  --success: #3f6657;
+  --violet: #7b5c63;
+
+  --type-jade: #3f6657;
+  --type-blue: #455d73;
+  --type-gold: #7c5b29;
+  --type-rose: #8e4a55;
+
+  --hero-bg: #223b34;
+  --hero-text: #f8f2e7;
+  --hero-muted: #c7d3c9;
+  --hero-line: rgba(248, 242, 231, 0.18);
+  --hero-seal: rgba(248, 242, 231, 0.08);
+
+  --focus: color-mix(in srgb, var(--jade) 55%, transparent);
+  --overlay: rgba(24, 28, 24, 0.46);
+
+  --shadow-sm: 0 1px 2px rgba(45, 40, 30, 0.04), 0 8px 22px rgba(45, 40, 30, 0.045);
+  --shadow-md: 0 2px 6px rgba(45, 40, 30, 0.05), 0 16px 38px rgba(45, 40, 30, 0.08);
+  --shadow-lg: 0 24px 70px rgba(30, 28, 22, 0.18);
+
+  --radius-xs: 6px;
+  --radius-sm: 9px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-2xl: 28px;
+  --radius-pill: 999px;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur: 180ms;
+  --dur-slow: 320ms;
+
+  --page-max: 1000px;
+  --nav-offset: 88px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #111412;
+  --paper-2: #191d19;
+  --sheet: #1a1e1b;
+  --sheet-raised: #222723;
+  --ink: #f1eadc;
+  --ink-2: #d5cdbf;
+  --ink-3: #a9a294;
+  --line: #343a34;
+  --line-strong: #4b5149;
+
+  --jade: #a6bfb1;
+  --jade-strong: #c7dccd;
+  --jade-soft: #243029;
+  --jade-tint: color-mix(in srgb, #a6bfb1 12%, transparent);
+  --on-jade: #10201a;
+
+  --cinnabar: #de9482;
+  --cinnabar-strong: #efb3a3;
+  --cinnabar-soft: color-mix(in srgb, #de9482 13%, transparent);
+  --cinnabar-solid: #a34c3f;
+  --on-cinnabar: #1b1210;
+  --on-cinnabar-solid: #fff5ef;
+
+  --gold: #cfb079;
+  --blue: #9fb6cb;
+  --success: #93bba7;
+  --violet: #c7a2ad;
+
+  --type-jade: #93bba7;
+  --type-blue: #9fb6cb;
+  --type-gold: #cfb079;
+  --type-rose: #d59aa2;
+
+  --hero-bg: #1b2a24;
+  --hero-text: #f3ecdf;
+  --hero-muted: #bbc9be;
+  --hero-line: rgba(243, 236, 223, 0.16);
+  --hero-seal: rgba(243, 236, 223, 0.07);
+
+  --focus: color-mix(in srgb, #a6bfb1 60%, transparent);
+  --overlay: rgba(5, 8, 6, 0.62);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2), 0 10px 26px rgba(0, 0, 0, 0.22);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.26), 0 20px 44px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 24px 70px rgba(0, 0, 0, 0.5);
+}
