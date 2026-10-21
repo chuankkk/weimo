@@ -554,6 +554,7 @@ const createEmptyState = (): AppState => ({
   exams: [],
   examSessions: [],
   practiceSession: null,
+  trash: [],
   settings: { ...defaultSettings }
 });
 
@@ -573,6 +574,7 @@ export const createSeedState = (): AppState => {
     exams: [seedExam],
     examSessions: [],
     practiceSession: null,
+    trash: [],
     settings: { ...defaultSettings }
   };
 };

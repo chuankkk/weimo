@@ -4,7 +4,7 @@
 
 > 一卷一答，墨见真知。
 
-当前版本：**2.0.0**（localStorage schema v2，兼容 v1 数据）。
+当前版本：**2.1.0**（localStorage schema v2，兼容 v1 数据）。
 
 [使用说明](./使用说明.md) · [题库制作指南](./题库制作指南.md) · [AI Skill](./.agents/skills/question-bank-builder/SKILL.md) · [GitHub 仓库](https://github.com/chuankkk/weimo) · [Releases](https://github.com/chuankkk/weimo/releases) · [MIT License](./LICENSE)
 
@@ -24,8 +24,8 @@
 
 | 能力 | 说明 |
 | --- | --- |
-| 题库工作台 | 一级题库/子库、搜索筛选、分页、题目编辑、题库合并、Excel/CSV/JSON 导入导出 |
-| 四种练习 | 顺序、随机、智能加权、错题重刷；断点续做、答题解析、同题笔记 |
+| 题库工作台 | 一级题库/子库、搜索筛选、分页、题目编辑、题库合并、回收站恢复、Excel/CSV/JSON 导入导出 |
+| 四种练习 | 顺序、随机、智能加权、错题重刷；断点续做、答题解析、同题笔记、提交后左右滑动切题 |
 | 错题回流 | 待复习/已掌握/已忽略、按题库与关键词筛选、单题/批量重刷、增量加载 |
 | 模拟考试 | 多题库蓝本组卷、限时作答、答题卡、自动交卷、题型报告、逐题复盘 |
 | 数据自主 | localStorage 本地优先、完整备份恢复、存储占用提示、无账号无遥测 |
@@ -63,6 +63,14 @@
 | 导入导出 | `read-excel-file` / `write-excel-file`，CSV/JSON 原生解析 |
 | 客户端 | Capacitor 8（Android），PWA + Service Worker |
 | 视觉 | 宣纸/玄墨/黛青/朱砂 token，自托管 Noto Sans/Serif SC |
+
+## 2.1 新增：回收站与滑动手势
+
+- **题库软删除**：删除题库不再直接抹掉数据，而是移入回收站；题库、题目、作答记录、错题和笔记都保留，可恢复。
+- **合并可撤销**：题库合并会记录每道题的原始归属，来源题库进入回收站；点“撤销合并”即可把题目和题库层级放回原处。
+- **回收站管理**：支持恢复、彻底删除单条、清空回收站；彻底删除才会真正移除本地数据。
+- **练习滑动手势**：练习提交答案后，可在题目区域左右滑动切换上一题/下一题；未提交时左滑会提示先提交。
+- **导出更干净**：Excel/CSV 只导出当前可见题库，回收站内容不混入普通导出；完整备份 JSON 仍保留回收站。
 
 ## 2.0 版做了什么
 
@@ -275,6 +283,8 @@ npm run build
 - `docs/screenshots/night-theme.png`：夜墨首页
 - `docs/screenshots/banks-mobile.png`：题库目录
 - `docs/screenshots/bank-detail.png`：题库详情与题目索引
+- `docs/screenshots/trash-mobile.png`：回收站与合并撤销
+- `docs/screenshots/trash-desktop.png`：桌面回收站
 - `docs/screenshots/practice-setup.png`：练习配置
 - `docs/screenshots/practice-runner.png`：答题与解析
 - `docs/screenshots/practice-summary.png`：练习总结与回顾

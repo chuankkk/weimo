@@ -1254,3 +1254,26 @@
   text-align: right;
 }
 
+
+.swipe-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: -5px 0 12px;
+  color: var(--ink-3);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+}
+
+.swipe-hint svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.6;
+}
+
+@media (min-width: 760px) {
+  .swipe-hint {
+    display: none;
+  }
+}

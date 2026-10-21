@@ -146,7 +146,11 @@ export function ConfirmHost() {
       {danger ? (
         <div className="confirm-warning">
           <AlertTriangle aria-hidden="true" />
-          <span>该操作会修改本地数据，且无法撤销。建议先在“我的 → 数据”中导出备份。</span>
+          <span>
+            {confirmState?.recoverable
+              ? "该操作会修改本地数据，但可以从回收站恢复。"
+              : "该操作会修改本地数据，且无法撤销。建议先在“我的 → 数据”中导出备份。"}
+          </span>
         </div>
       ) : null}
     </Modal>

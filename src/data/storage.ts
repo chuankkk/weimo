@@ -12,6 +12,8 @@ import type {
   QuestionType,
   Settings,
   ThemeMode,
+  TrashEntry,
+  TrashMove,
   UserNote,
   WrongQuestion,
   WrongStatus
@@ -72,7 +74,8 @@ const normalizeBanks = (value: unknown): QuestionBank[] => {
       color: asString(item.color, "#2C4B43"),
       createdAt: created,
       updatedAt: asIso(item.updatedAt, created),
-      archived: Boolean(item.archived)
+      archived: Boolean(item.archived),
+      deletedAt: asString(item.deletedAt).trim() ? asIso(item.deletedAt) : undefined
     });
   }
 
@@ -96,6 +99,57 @@ const normalizeBanks = (value: unknown): QuestionBank[] => {
     }
   }
   return banks;
+};
+
+const normalizeTrash = (value: unknown, banks: QuestionBank[], questions: Question[]): TrashEntry[] => {
+  if (!Array.isArray(value)) return [];
+  const bankIds = new Set(banks.map((bank) => bank.id));
+  const questionIds = new Set(questions.map((question) => question.id));
+  const entries: TrashEntry[] = [];
+  const seen = new Set<string>();
+
+  for (const item of value) {
+    if (!isObject(item)) continue;
+    const kind = item.kind === "merge" ? "merge" : item.kind === "bank" ? "bank" : "";
+    const bankId = asString(item.bankId).trim();
+    if (!kind || !bankId || !bankIds.has(bankId)) continue;
+    let id = asString(item.id).trim() || `trash-normalized-${entries.length + 1}`;
+    while (seen.has(id)) id = `${id}-${entries.length + 1}`;
+    seen.add(id);
+    const bank = banks.find((entry) => entry.id === bankId);
+    const targetBankId = asString(item.targetBankId).trim() || undefined;
+    const targetBank = targetBankId ? banks.find((entry) => entry.id === targetBankId) : undefined;
+    const moves: TrashMove[] = Array.isArray(item.moves)
+      ? item.moves
+          .filter(isObject)
+          .map((move) => ({
+            questionId: asString(move.questionId).trim(),
+            bankId: asString(move.bankId).trim(),
+            rootBankId: asString(move.rootBankId).trim()
+          }))
+          .filter(
+            (move) =>
+              Boolean(move.questionId && move.bankId && move.rootBankId) &&
+              questionIds.has(move.questionId) &&
+              bankIds.has(move.bankId) &&
+              bankIds.has(move.rootBankId)
+          )
+      : [];
+    entries.push({
+      id,
+      kind,
+      bankId,
+      bankName: asString(item.bankName).trim() || bank?.name || "未命名题库",
+      targetBankId,
+      targetBankName: asString(item.targetBankName).trim() || targetBank?.name || undefined,
+      createdAt: asIso(item.createdAt),
+      bankCount: Math.max(1, Math.round(asNumber(item.bankCount, 1))),
+      questionCount: Math.max(0, Math.round(asNumber(item.questionCount, moves.length))),
+      moves: moves.length ? moves : undefined
+    });
+  }
+
+  return entries;
 };
 
 const rootIdOf = (banks: QuestionBank[], bankId: string) => {
@@ -230,7 +284,7 @@ const normalizeNotes = (value: unknown, questionIds: Set<string>): UserNote[] =>
 
 const normalizeExams = (value: unknown, banks: QuestionBank[]): ExamTemplate[] => {
   const source = Array.isArray(value) ? value : createSeedState().exams;
-  const bankIds = new Set(banks.filter((bank) => !bank.archived).map((bank) => bank.id));
+  const bankIds = new Set(banks.filter((bank) => !bank.archived && !bank.deletedAt).map((bank) => bank.id));
   const exams: ExamTemplate[] = [];
   const seen = new Set<string>();
   for (const item of source) {
@@ -369,7 +423,8 @@ export const normalizeState = (raw: unknown): AppState => {
     exams: normalizeExams(raw.exams, banks),
     examSessions: normalizeExamSessions(raw.examSessions, questionIds),
     practiceSession: normalizePracticeSession(raw.practiceSession, questionIds),
-    settings: normalizeSettings(raw.settings)
+    settings: normalizeSettings(raw.settings),
+    trash: normalizeTrash(raw.trash, banks, questions)
   };
 };
 

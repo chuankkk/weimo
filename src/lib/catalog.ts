@@ -33,23 +33,28 @@ export interface Catalog {
  */
 export const createCatalog = (banks: QuestionBank[], questions: Question[]): Catalog => {
   const bankById = new Map(banks.map((bank) => [bank.id, bank]));
-  const questionById = new Map(questions.map((question) => [question.id, question]));
+  const isVisibleBank = (bank: QuestionBank) => !bank.archived && !bank.deletedAt;
+  const visibleBanks = banks.filter(isVisibleBank).sort(compareBanks);
+  const visibleBankIds = new Set(visibleBanks.map((bank) => bank.id));
+  const visibleQuestions = questions.filter(
+    (question) => visibleBankIds.has(question.bankId) && visibleBankIds.has(question.rootBankId)
+  );
+  const questionById = new Map(visibleQuestions.map((question) => [question.id, question]));
 
   const childrenMap = new Map<string, QuestionBank[]>();
   for (const bank of banks) {
-    if (!bank.parentId || bank.archived) continue;
+    if (!bank.parentId || !isVisibleBank(bank) || !visibleBankIds.has(bank.parentId)) continue;
     const list = childrenMap.get(bank.parentId) ?? [];
     list.push(bank);
     childrenMap.set(bank.parentId, list);
   }
   for (const list of childrenMap.values()) list.sort(compareBanks);
 
-  const visibleBanks = banks.filter((bank) => !bank.archived).sort(compareBanks);
   const roots = visibleBanks.filter((bank) => !bank.parentId);
 
   const byBank = new Map<string, Question[]>();
   const byRoot = new Map<string, Question[]>();
-  const sortedQuestions = [...questions].sort(compareQuestions);
+  const sortedQuestions = [...visibleQuestions].sort(compareQuestions);
   for (const question of sortedQuestions) {
     if (question.bankId) {
       const list = byBank.get(question.bankId) ?? [];
@@ -143,7 +148,7 @@ export const createCatalog = (banks: QuestionBank[], questions: Question[]): Cat
 
   return {
     banks,
-    questions,
+    questions: visibleQuestions,
     bankById,
     questionById,
     roots,

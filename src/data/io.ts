@@ -305,26 +305,31 @@ export const importDataFile = async (state: AppState, file: File): Promise<Impor
 
 const rowsFromState = (state: AppState) => {
   const bankById = new Map(state.banks.map((bank) => [bank.id, bank]));
-  return state.questions.map((question) => {
-    const root = bankById.get(question.rootBankId);
-    const child = bankById.get(question.bankId);
-    const row: Record<string, string | number> = {
-      大题库: root?.name ?? "",
-      小题库: child?.parentId ? child.name : "",
-      题型: question.type,
-      题干: question.stem,
-      答案: question.answer.join(","),
-      可接受答案: question.answerAliases.map((aliases) => aliases.join("|")).join(";"),
-      解析: question.explanation,
-      知识点: question.knowledgePoints.join(";"),
-      标签: question.tags.join(";"),
-      难度: question.difficulty,
-      来源: question.source,
-      排序号: question.sortIndex
-    };
-    for (const option of question.options) row[`选项${option.key}`] = option.text;
-    return row;
-  });
+  const visibleBankIds = new Set(
+    state.banks.filter((bank) => !bank.archived && !bank.deletedAt).map((bank) => bank.id)
+  );
+  return state.questions
+    .filter((question) => visibleBankIds.has(question.bankId) && visibleBankIds.has(question.rootBankId))
+    .map((question) => {
+      const root = bankById.get(question.rootBankId);
+      const child = bankById.get(question.bankId);
+      const row: Record<string, string | number> = {
+        大题库: root?.name ?? "",
+        小题库: child?.parentId ? child.name : "",
+        题型: question.type,
+        题干: question.stem,
+        答案: question.answer.join(","),
+        可接受答案: question.answerAliases.map((aliases) => aliases.join("|")).join(";"),
+        解析: question.explanation,
+        知识点: question.knowledgePoints.join(";"),
+        标签: question.tags.join(";"),
+        难度: question.difficulty,
+        来源: question.source,
+        排序号: question.sortIndex
+      };
+      for (const option of question.options) row[`选项${option.key}`] = option.text;
+      return row;
+    });
 };
 
 const browserDownloadBlob = (filename: string, blob: Blob) => {

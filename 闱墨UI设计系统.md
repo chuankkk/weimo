@@ -110,8 +110,8 @@
 ## 6. 页面布局
 
 - 首页：卷首、页内导航、指标、开始学习、学习动态（手机端练习活跃度/薄弱知识点切换）、最近作答、题库概览、页脚说明。
-- 题库：目录 / 导入导出 / 合并三段；目录两列卡片，详情为“头部 + 指标 + 子库 + 题型分布 + 搜索 + 分页索引”。
-- 练习：未开始为配置页（页内导航、断点卡、模式、范围、题型、数量、固定开始条）；运行态为沉浸答题页；结束态为总结页。
+- 题库：目录 / 导入导出 / 合并 / 回收站四段；目录两列卡片，详情为“头部 + 指标 + 子库 + 题型分布 + 搜索 + 分页索引”；删除与合并进入回收站，可恢复或撤销。
+- 练习：未开始为配置页（页内导航、断点卡、模式、范围、题型、数量、固定开始条）；运行态为沉浸答题页，提交后可左右滑动切题；结束态为总结页。
 - 错题：总览、状态分段、题库/关键词筛选、错题卡、答案解析展开与操作；列表每批 20 条增量加载。
 - 考试：组卷摘要、进行中提示、页内导航、策略库、组卷设置、题型数量、固定开始条、考试记录。
 - 我的：品牌卡、页内导航、外观、学习偏好、数据、维护、关于。
@@ -158,6 +158,7 @@ Constraints: no text, no Chinese characters, no logos, no people, no watermark; 
 - `home-mobile.png`、`home-full.png`、`home-desktop.png`
 - `home-empty.png`、`night-theme.png`、`settings-dark.png`
 - `banks-mobile.png`、`bank-detail.png`
+- `trash-mobile.png`、`trash-desktop.png`
 - `practice-setup.png`、`practice-runner.png`、`practice-summary.png`
 - `wrong-mobile.png`
 - `exam-planner.png`、`exam-runner.png`、`exam-report.png`
@@ -165,4 +166,4 @@ Constraints: no text, no Chinese characters, no logos, no people, no watermark; 
 - `android-runtime.png`、`android-empty.png`（Android 模拟器 1080×2400）
 - `home-baseline.png`（首页视觉基线）
 
-工程验收：`npx tsc --noEmit`、`npm run build`、生产预览加载；交互冒烟覆盖练习完成、断点续做、考试自动交卷、答题卡交卷、报告、CSV 导入、完整备份恢复、Excel 导出与主题切换。
+工程验收：`npx tsc --noEmit`、`npm run build`、生产预览加载；交互冒烟覆盖练习完成、断点续做、左右滑动切题、题库删除/恢复、合并撤销、回收站彻底删除、考试自动交卷、答题卡交卷、报告、CSV 导入、完整备份恢复、Excel 导出与主题切换。

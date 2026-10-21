@@ -924,6 +924,24 @@
     font-size: 9px;
   }
 
+  .banks-page .page-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .banks-page .page-head-actions {
+    width: 100%;
+  }
+
+  .banks-page .page-head-actions .btn {
+    width: 100%;
+  }
+
+  .banks-page .page-head h1 {
+    font-size: 36px;
+  }
+
   .quick-grid,
   .mode-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -995,3 +1013,4 @@
     transition-duration: 0.01ms !important;
   }
 }
+

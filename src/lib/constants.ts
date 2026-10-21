@@ -68,6 +68,6 @@ export const MIN_BANK_COUNT = 1;
 
 export const APP_NAME = "闱墨";
 export const APP_SLOGAN = "一卷一答，墨见真知";
-export const APP_VERSION = "2.0.0";
+export const APP_VERSION = "2.1.0";
 
 export const ALL_TYPES: QuestionType[] = [...TYPE_ORDER];

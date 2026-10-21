@@ -12,17 +12,27 @@ import {
   Merge,
   Pencil,
   Plus,
+  RotateCcw,
   SearchX,
   Trash2,
   Upload
 } from "lucide-react";
-import type { Question, QuestionBank, QuestionType } from "../types";
+import type { Question, QuestionBank, QuestionType, TrashEntry } from "../types";
 import { BANK_COLORS, TYPE_ORDER, typeLabel, typeTone } from "../lib/constants";
 import { useApp } from "../store/AppStore";
-import { deleteBank, deleteQuestion, mergeBanks, upsertBank } from "../store/actions";
+import {
+  deleteBank,
+  deleteQuestion,
+  emptyTrash,
+  mergeBanks,
+  purgeTrashEntry,
+  restoreTrashEntry,
+  upsertBank
+} from "../store/actions";
 import { navigate, useRoute } from "../lib/router";
 import { useDocumentTitle } from "../lib/hooks";
 import { cn } from "../lib/text";
+import { relativeTime } from "../lib/date";
 import { DataTools } from "../components/DataTools";
 import { Modal } from "../components/overlays";
 import { QuestionEditor } from "../components/QuestionEditor";
@@ -41,12 +51,13 @@ import {
   TypeBadge
 } from "../components/ui";
 
-type BanksView = "catalog" | "import" | "merge";
+type BanksView = "catalog" | "import" | "merge" | "trash";
 
 const viewOptions = [
   { value: "catalog", label: "目录", icon: <FolderOpen /> },
   { value: "import", label: "导入导出", icon: <Upload /> },
-  { value: "merge", label: "合并", icon: <Merge /> }
+  { value: "merge", label: "合并", icon: <Merge /> },
+  { value: "trash", label: "回收站", icon: <Trash2 /> }
 ];
 
 export function BanksPage() {
@@ -54,10 +65,11 @@ export function BanksPage() {
   const { state, catalog } = useApp();
   const route = useRoute();
   const rawView = route.params.get("view");
-  const view: BanksView = rawView === "import" || rawView === "merge" ? rawView : "catalog";
+  const view: BanksView = rawView === "import" || rawView === "merge" || rawView === "trash" ? rawView : "catalog";
   const activeBankId = route.params.get("bank");
   const activeBankLookup = activeBankId ? catalog.bankById.get(activeBankId) : undefined;
-  const activeBank = activeBankLookup && !activeBankLookup.archived ? activeBankLookup : undefined;
+  const activeBank =
+    activeBankLookup && !activeBankLookup.archived && !activeBankLookup.deletedAt ? activeBankLookup : undefined;
   const [createBankOpen, setCreateBankOpen] = useState(false);
   const [createChildParent, setCreateChildParent] = useState<string | undefined>();
   const [editBank, setEditBank] = useState<QuestionBank | null>(null);
@@ -67,7 +79,7 @@ export function BanksPage() {
     question: null
   });
 
-  const totalQuestions = state.questions.length;
+  const totalQuestions = catalog.questions.length;
 
   if (activeBank) {
     return (
@@ -127,7 +139,9 @@ export function BanksPage() {
           ariaLabel="题库视图"
           value={view}
           onChange={(next) => navigate("banks", next === "catalog" ? undefined : { view: next })}
-          options={viewOptions}
+          options={viewOptions.map((option) =>
+            option.value === "trash" && state.trash.length ? { ...option, badge: state.trash.length } : option
+          )}
         />
       </div>
 
@@ -142,6 +156,7 @@ export function BanksPage() {
       ) : null}
       {view === "import" ? <BankImportView /> : null}
       {view === "merge" ? <BankMergeView /> : null}
+      {view === "trash" ? <BankTrashView /> : null}
 
       <BankFormModal
         open={createBankOpen}
@@ -307,14 +322,15 @@ function BankMergeView() {
     if (!canMerge || !fromBank || !toBank) return;
     const accepted = await confirm({
       title: "合并题库？",
-      description: `将「${fromBank.name}」下的 ${count} 道题移动到「${toBank.name}」，来源题库会被归档。归档可在数据层面恢复，但应用内不再显示。`,
+      description: `将「${fromBank.name}」下的 ${count} 道题移动到「${toBank.name}」，来源题库会进入回收站，可在那里撤销合并。`,
       confirmText: "开始合并",
-      tone: "danger"
+      tone: "danger",
+      recoverable: true
     });
     if (!accepted) return;
     update((current) => mergeBanks(current, catalog, fromId, toId));
-    toast(`已合并 ${count} 道题到「${toBank.name}」`, { tone: "success" });
-    navigate("banks");
+    toast(`已合并 ${count} 道题到「${toBank.name}」，可在回收站恢复`, { tone: "success" });
+    navigate("banks", { view: "trash" });
   };
 
   const bankOptions = catalog.roots.flatMap((root) => [
@@ -375,8 +391,96 @@ function BankMergeView() {
         <Button icon={<Merge />} onClick={() => void runMerge()} disabled={!canMerge}>
           确认合并
         </Button>
-        <p className="field-hint">合并不会删除历史练习与错题记录，题目会重新归属到目标题库。</p>
+        <p className="field-hint">合并不会删除历史练习与错题记录；来源题库会进入回收站，可撤销合并。</p>
       </div>
+    </>
+  );
+}
+
+function BankTrashView() {
+  const { state, update, toast, confirm } = useApp();
+  const entries = state.trash;
+
+  const restore = (entry: TrashEntry) => {
+    update((current) => restoreTrashEntry(current, entry.id));
+    toast(entry.kind === "merge" ? "已撤销合并" : "题库已恢复", { tone: "success" });
+  };
+
+  const purge = async (entry: TrashEntry) => {
+    const accepted = await confirm({
+      title: entry.kind === "merge" ? "彻底删除合并归档？" : "彻底删除题库？",
+      description:
+        entry.kind === "merge"
+          ? `会删除「${entry.bankName}」的归档条目，但不会删除目标题库中已经合并的题目。`
+          : `「${entry.bankName}」下的 ${entry.questionCount} 道题、作答记录、错题和笔记都会永久删除，无法恢复。`,
+      confirmText: "彻底删除",
+      tone: "danger"
+    });
+    if (!accepted) return;
+    update((current) => purgeTrashEntry(current, entry.id));
+    toast("已彻底删除", { tone: "success" });
+  };
+
+  const clear = async () => {
+    const accepted = await confirm({
+      title: "清空回收站？",
+      description: "所有已删除的题库、题目记录和合并归档都会被永久删除，无法恢复。",
+      confirmText: "清空回收站",
+      tone: "danger"
+    });
+    if (!accepted) return;
+    update((current) => emptyTrash(current));
+    toast("回收站已清空", { tone: "success" });
+  };
+
+  return (
+    <>
+      <SectionHead
+        icon={<Trash2 />}
+        title="回收站"
+        hint="删除的题库和合并操作都可以在这里恢复"
+        action={
+          entries.length ? (
+            <Button variant="quiet" size="sm" icon={<Trash2 />} onClick={() => void clear()}>
+              清空回收站
+            </Button>
+          ) : undefined
+        }
+      />
+      {entries.length ? (
+        <div className="trash-list">
+          {entries.map((entry) => (
+            <article className="trash-card card" key={entry.id}>
+              <span className={cn("trash-kind", entry.kind === "merge" ? "is-merge" : "is-bank")}>
+                {entry.kind === "merge" ? "合并" : "删除"}
+              </span>
+              <div className="trash-copy">
+                <strong>{entry.bankName}</strong>
+                <p>
+                  {entry.kind === "merge"
+                    ? `已合并到「${entry.targetBankName || "未知题库"}」 · ${entry.questionCount} 道题`
+                    : `${entry.bankCount} 个题库条目 · ${entry.questionCount} 道题`}
+                </p>
+                <small>{relativeTime(entry.createdAt)}</small>
+              </div>
+              <div className="trash-actions">
+                <Button size="sm" icon={<RotateCcw />} onClick={() => restore(entry)}>
+                  {entry.kind === "merge" ? "撤销合并" : "恢复题库"}
+                </Button>
+                <Button variant="ghost" size="sm" icon={<Trash2 />} onClick={() => void purge(entry)}>
+                  彻底删除
+                </Button>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          icon={<Trash2 />}
+          title="回收站是空的"
+          description="删除的题库会先保留在这里，合并操作也可以撤销；需要时随时恢复。"
+        />
+      )}
     </>
   );
 }
@@ -443,14 +547,15 @@ function BankDetail({
     const questionCount = state.questions.filter((question) => scope.includes(question.bankId) || scope.includes(question.rootBankId)).length;
     const accepted = await confirm({
       title: `删除「${bank.name}」？`,
-      description: `会同时删除 ${scope.length} 个题库条目、${questionCount} 道题及其错题与笔记记录，操作无法撤销。`,
-      confirmText: "删除题库",
-      tone: "danger"
+      description: `会把 ${scope.length} 个题库条目和 ${questionCount} 道题移入回收站，可在「题库 → 回收站」恢复。`,
+      confirmText: "移入回收站",
+      tone: "danger",
+      recoverable: true
     });
     if (!accepted) return;
     update((current) => deleteBank(current, catalog, bank.id));
-    toast("题库已删除", { tone: "success" });
-    navigate("banks");
+    toast("题库已移入回收站，可恢复", { tone: "success" });
+    navigate("banks", { view: "trash" });
   };
 
   const removeQuestion = async (question: Question) => {

@@ -32,6 +32,8 @@ export interface ConfirmOptions {
   confirmText?: string;
   cancelText?: string;
   tone?: "default" | "danger";
+  /** 操作可撤销/可从回收站恢复时，确认框不再提示“无法撤销”。 */
+  recoverable?: boolean;
 }
 
 export interface ConfirmDialogState extends ConfirmOptions {

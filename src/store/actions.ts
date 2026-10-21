@@ -4,6 +4,8 @@ import type {
   PracticeSessionState,
   Question,
   QuestionBank,
+  TrashEntry,
+  TrashMove,
   WrongStatus
 } from "../types";
 import type { Catalog } from "../lib/catalog";
@@ -41,6 +43,71 @@ const stripBankFromExams = (state: AppState, removedBankIds: Set<string>) => ({
   }))
 });
 
+/** 收集题库子树，包含已归档/已软删除的条目，供回收站恢复与彻底删除使用。 */
+const collectSubtreeIds = (banks: QuestionBank[], rootId: string) => {
+  const ids = new Set<string>([rootId]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const bank of banks) {
+      if (bank.parentId && ids.has(bank.parentId) && !ids.has(bank.id)) {
+        ids.add(bank.id);
+        changed = true;
+      }
+    }
+  }
+  return ids;
+};
+
+const bankPathLabel = (banks: QuestionBank[], bankId: string) => {
+  const byId = new Map(banks.map((bank) => [bank.id, bank]));
+  const path: string[] = [];
+  let current = byId.get(bankId);
+  let guard = 0;
+  while (current && guard < 8) {
+    path.unshift(current.name);
+    current = current.parentId ? byId.get(current.parentId) : undefined;
+    guard += 1;
+  }
+  return path.join(" / ") || "未命名题库";
+};
+
+const makeTrashId = () => `trash-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+
+/** 真正删除题库子树及其作答、错题、笔记、考试引用；仅用于“彻底删除”与清空回收站。 */
+const removeBankData = (state: AppState, removed: Set<string>): AppState => {
+  const removedQuestions = new Set(
+    state.questions
+      .filter((question) => removed.has(question.bankId) || removed.has(question.rootBankId))
+      .map((question) => question.id)
+  );
+  const next: AppState = {
+    ...state,
+    banks: state.banks.filter((bank) => !removed.has(bank.id)),
+    questions: state.questions.filter((question) => !removedQuestions.has(question.id)),
+    records: state.records.filter((record) => !removedQuestions.has(record.questionId)),
+    wrongs: state.wrongs.filter((wrong) => !removedQuestions.has(wrong.questionId)),
+    notes: state.notes.filter((note) => !removedQuestions.has(note.questionId)),
+    examSessions: state.examSessions
+      .map((session) => {
+        const questionIds = session.questionIds.filter((id) => !removedQuestions.has(id));
+        const answers = Object.fromEntries(Object.entries(session.answers).filter(([id]) => !removedQuestions.has(id)));
+        const marked = session.marked.filter((id) => !removedQuestions.has(id));
+        return { ...session, questionIds, answers, marked };
+      })
+      .filter((session) => session.questionIds.length > 0),
+    practiceSession:
+      state.practiceSession && state.practiceSession.questionIds.some((id) => !removedQuestions.has(id))
+        ? {
+            ...state.practiceSession,
+            questionIds: state.practiceSession.questionIds.filter((id) => !removedQuestions.has(id)),
+            currentIndex: 0
+          }
+        : null
+  };
+  return stripBankFromExams(next, removed);
+};
+
 export const upsertBank = (state: AppState, draft: BankDraft, bankId?: string): AppState => {
   const createdAt = nowIso();
   if (bankId) {
@@ -75,37 +142,108 @@ export const upsertBank = (state: AppState, draft: BankDraft, bankId?: string): 
 };
 
 export const deleteBank = (state: AppState, catalog: Catalog, bankId: string): AppState => {
-  const removed = new Set(catalog.subtreeIds(bankId));
+  const bank = catalog.bankById.get(bankId);
+  if (!bank || bank.deletedAt) return state;
+  const removed = collectSubtreeIds(state.banks, bankId);
   const removedQuestions = new Set(
-    state.questions.filter((question) => removed.has(question.bankId) || removed.has(question.rootBankId)).map((question) => question.id)
+    state.questions
+      .filter((question) => removed.has(question.bankId) || removed.has(question.rootBankId))
+      .map((question) => question.id)
   );
-  const questions = state.questions.filter((question) => !removedQuestions.has(question.id));
-  const next: AppState = {
-    ...state,
-    banks: state.banks.filter((bank) => !removed.has(bank.id)),
-    questions,
-    records: state.records.filter((record) => !removedQuestions.has(record.questionId)),
-    wrongs: state.wrongs.filter((wrong) => !removedQuestions.has(wrong.questionId)),
-    notes: state.notes.filter((note) => !removedQuestions.has(note.questionId)),
-    examSessions: state.examSessions
-      .map((session) => {
-        const questionIds = session.questionIds.filter((id) => !removedQuestions.has(id));
-        const answers = Object.fromEntries(Object.entries(session.answers).filter(([id]) => !removedQuestions.has(id)));
-        const marked = session.marked.filter((id) => !removedQuestions.has(id));
-        return { ...session, questionIds, answers, marked };
-      })
-      .filter((session) => session.questionIds.length > 0),
-    practiceSession:
-      state.practiceSession && state.practiceSession.questionIds.some((id) => !removedQuestions.has(id))
-        ? {
-            ...state.practiceSession,
-            questionIds: state.practiceSession.questionIds.filter((id) => !removedQuestions.has(id)),
-            currentIndex: 0
-          }
-        : null
+  const stamp = nowIso();
+  const entry: TrashEntry = {
+    id: makeTrashId(),
+    kind: "bank",
+    bankId,
+    bankName: bankPathLabel(state.banks, bankId),
+    createdAt: stamp,
+    bankCount: removed.size,
+    questionCount: removedQuestions.size
   };
-  return stripBankFromExams(next, removed);
+  const practiceSession = state.practiceSession
+    ? {
+        ...state.practiceSession,
+        questionIds: state.practiceSession.questionIds.filter((id) => !removedQuestions.has(id)),
+        answers: Object.fromEntries(
+          Object.entries(state.practiceSession.answers).filter(([id]) => !removedQuestions.has(id))
+        ),
+        submitted: Object.fromEntries(
+          Object.entries(state.practiceSession.submitted).filter(([id]) => !removedQuestions.has(id))
+        ),
+        currentIndex: 0
+      }
+    : null;
+  return {
+    ...state,
+    banks: state.banks.map((item) =>
+      removed.has(item.id) ? { ...item, deletedAt: stamp, updatedAt: stamp } : item
+    ),
+    practiceSession: practiceSession && practiceSession.questionIds.length ? practiceSession : null,
+    trash: [entry, ...state.trash.filter((item) => !removed.has(item.bankId))]
+  };
 };
+
+export const restoreTrashEntry = (state: AppState, entryId: string): AppState => {
+  const entry = state.trash.find((item) => item.id === entryId);
+  if (!entry) return state;
+  const stamp = nowIso();
+
+  if (entry.kind === "bank") {
+    if (!state.banks.some((bank) => bank.id === entry.bankId)) {
+      return { ...state, trash: state.trash.filter((item) => item.id !== entry.id) };
+    }
+    const restored = collectSubtreeIds(state.banks, entry.bankId);
+    return {
+      ...state,
+      banks: state.banks.map((bank) =>
+        restored.has(bank.id) ? { ...bank, deletedAt: undefined, updatedAt: stamp } : bank
+      ),
+      trash: state.trash.filter((item) => item.id !== entry.id)
+    };
+  }
+
+  if (!state.banks.some((bank) => bank.id === entry.bankId)) {
+    return { ...state, trash: state.trash.filter((item) => item.id !== entry.id) };
+  }
+  const sourceIds = collectSubtreeIds(state.banks, entry.bankId);
+  const moves = new Map((entry.moves ?? []).map((move) => [move.questionId, move]));
+  const knownBankIds = new Set(state.banks.map((bank) => bank.id));
+  return {
+    ...state,
+    banks: state.banks.map((bank) =>
+      sourceIds.has(bank.id)
+        ? { ...bank, archived: undefined, deletedAt: undefined, updatedAt: stamp }
+        : bank
+    ),
+    questions: state.questions.map((question) => {
+      const move = moves.get(question.id);
+      if (!move || !knownBankIds.has(move.bankId)) return question;
+      // 只撤销仍停留在目标题库的题目；用户后来手动移到别处的题目保持不动。
+      if (entry.targetBankId && question.bankId !== entry.targetBankId) return question;
+      return {
+        ...question,
+        bankId: move.bankId,
+        rootBankId: move.rootBankId,
+        updatedAt: stamp
+      };
+    }),
+    trash: state.trash.filter((item) => item.id !== entry.id)
+  };
+};
+
+export const purgeTrashEntry = (state: AppState, entryId: string): AppState => {
+  const entry = state.trash.find((item) => item.id === entryId);
+  if (!entry) return state;
+  const removed = collectSubtreeIds(state.banks, entry.bankId);
+  const next = removeBankData(state, removed);
+  return {
+    ...next,
+    trash: next.trash.filter((item) => item.id !== entry.id && !removed.has(item.bankId))
+  };
+};
+
+export const emptyTrash = (state: AppState): AppState =>
+  state.trash.reduce((current, entry) => purgeTrashEntry(current, entry.id), state);
 
 export const upsertQuestion = (state: AppState, draft: QuestionDraft): AppState => {
   const bank = state.banks.find((item) => item.id === draft.bankId);
@@ -218,17 +356,42 @@ export const mergeBanks = (state: AppState, catalog: Catalog, fromId: string, to
   // 禁止把父题库合并进自己的子题库，否则目标也会被归档。
   if (sourceIds.has(toId)) return state;
   const targetRoot = catalog.rootOf(toId);
+  const fromBank = catalog.bankById.get(fromId);
+  const toBank = catalog.bankById.get(toId);
+  if (!fromBank || !toBank) return state;
+  const moves: TrashMove[] = state.questions
+    .filter((question) => sourceIds.has(question.bankId) || sourceIds.has(question.rootBankId))
+    .map((question) => ({
+      questionId: question.id,
+      bankId: question.bankId,
+      rootBankId: question.rootBankId
+    }));
+  if (!moves.length) return state;
+  const movedIds = new Set(moves.map((move) => move.questionId));
   const stamp = nowIso();
+  const entry: TrashEntry = {
+    id: makeTrashId(),
+    kind: "merge",
+    bankId: fromId,
+    bankName: bankPathLabel(state.banks, fromId),
+    targetBankId: toId,
+    targetBankName: bankPathLabel(state.banks, toId),
+    createdAt: stamp,
+    bankCount: sourceIds.size,
+    questionCount: moves.length,
+    moves
+  };
   return {
     ...state,
     banks: state.banks.map((bank) =>
       sourceIds.has(bank.id) ? { ...bank, archived: true, updatedAt: stamp } : bank
     ),
     questions: state.questions.map((question) =>
-      sourceIds.has(question.bankId) || sourceIds.has(question.rootBankId)
+      movedIds.has(question.id)
         ? { ...question, bankId: toId, rootBankId: targetRoot, updatedAt: stamp }
         : question
-    )
+    ),
+    trash: [entry, ...state.trash.filter((item) => !(item.kind === "merge" && item.bankId === fromId))]
   };
 };
 

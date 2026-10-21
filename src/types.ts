@@ -27,6 +27,29 @@ export interface QuestionBank {
   createdAt: string;
   updatedAt: string;
   archived?: boolean;
+  /** 软删除：仍在本地数据中，可在回收站恢复。 */
+  deletedAt?: string;
+}
+
+export interface TrashMove {
+  questionId: string;
+  bankId: string;
+  rootBankId: string;
+}
+
+export interface TrashEntry {
+  id: string;
+  kind: "bank" | "merge";
+  /** 被删除的题库，或合并操作的来源题库。 */
+  bankId: string;
+  bankName: string;
+  createdAt: string;
+  bankCount: number;
+  questionCount: number;
+  targetBankId?: string;
+  targetBankName?: string;
+  /** 合并时记录每道题的原始归属，用于撤销合并。 */
+  moves?: TrashMove[];
 }
 
 export interface Question {
@@ -147,6 +170,8 @@ export interface AppState {
   examSessions: ExamSession[];
   practiceSession?: PracticeSessionState | null;
   settings: Settings;
+  /** 回收站：软删除的题库与可撤销的合并操作。 */
+  trash: TrashEntry[];
 }
 
 export interface QuestionEvaluation {

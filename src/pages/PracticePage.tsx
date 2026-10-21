@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type TouchEvent as ReactTouchEvent } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -9,6 +9,7 @@ import {
   Clock,
   Layers3,
   ListChecks,
+  MoveHorizontal,
   Play,
   RotateCcw,
   Shuffle,
@@ -420,6 +421,7 @@ function PracticeRunner({ session }: { session: PracticeSessionState }) {
   const question = catalog.questionById.get(session.questionIds[session.currentIndex]);
   const [autoNext, setAutoNext] = useState(false);
   const autoTimer = useRef<number | null>(null);
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
 
   const answer = question ? session.answers[question.id] ?? [] : [];
   const submitted = question ? Boolean(session.submitted[question.id]) : false;
@@ -474,6 +476,34 @@ function PracticeRunner({ session }: { session: PracticeSessionState }) {
       ...current,
       currentIndex: Math.max(0, current.currentIndex - 1)
     }));
+  };
+
+  const startSwipe = (event: ReactTouchEvent<HTMLElement>) => {
+    if (event.touches.length !== 1) return;
+    const target = event.target as HTMLElement;
+    if (target.closest("input, textarea, select, button, a, [contenteditable='true']")) return;
+    const touch = event.touches[0];
+    swipeStart.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const endSwipe = (event: ReactTouchEvent<HTMLElement>) => {
+    const start = swipeStart.current;
+    swipeStart.current = null;
+    if (!start || event.changedTouches.length !== 1) return;
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    // 排除纵向滚动和误触；横向滑动超过 56px 才切题。
+    if (Math.abs(deltaX) < 56 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
+    if (deltaX < 0) {
+      if (!submitted) {
+        toast("先提交答案，再滑动切到下一题", { tone: "info" });
+        return;
+      }
+      goNext();
+      return;
+    }
+    if (session.currentIndex > 0) goPrev();
   };
 
   const submit = () => {
@@ -584,7 +614,14 @@ function PracticeRunner({ session }: { session: PracticeSessionState }) {
   }
 
   return (
-    <section className="page runner-page">
+    <section
+      className="page runner-page"
+      onTouchStart={startSwipe}
+      onTouchEnd={endSwipe}
+      onTouchCancel={() => {
+        swipeStart.current = null;
+      }}
+    >
       <header className="runner-bar">
         <IconButton label="退出练习" onClick={() => void requestExit()}>
           <ArrowLeft />
@@ -607,6 +644,9 @@ function PracticeRunner({ session }: { session: PracticeSessionState }) {
           </span>
         </div>
       </div>
+      <p className="swipe-hint">
+        <MoveHorizontal aria-hidden="true" /> 提交后可左右滑动切题
+      </p>
 
       <QuestionCard
         question={question}
@@ -649,7 +689,7 @@ function PracticeRunner({ session }: { session: PracticeSessionState }) {
         )}
       </div>
       <p className="runner-hint">
-        快捷键：数字选择选项 · Enter {submitted ? "继续" : "提交"} · 提交后立即显示解析
+        快捷键：数字选择选项 · Enter {submitted ? "继续" : "提交"} · 左右滑动切题 · 提交后立即显示解析
       </p>
     </section>
   );
