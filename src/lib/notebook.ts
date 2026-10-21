@@ -205,7 +205,7 @@ const documentStyles = `
     .book { width: 100%; margin: 0; padding: 22px 18px; }
     .cover { min-height: 0; padding: 24px 20px; }
     .cover-main { margin-top: 32px; }
-    .cover h1 { font-size: 36px; }
+    .cover h1 { font-size: clamp(26px, 8.5vw, 36px); }
     .cover-sub { font-size: 11px; }
     .cover-stats { margin-top: 22px; }
     .stat { min-width: 78px; padding: 8px 10px; }
