@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/chuankkk/weimo/schemas/question-bank.schema.json",
+  "title": "闱墨题库导入行",
+  "description": "Row-array format accepted by 闱墨 import (not a full backup with banks).",
+  "oneOf": [
+    {
+      "type": "array",
+      "items": { "$ref": "#/$defs/row" }
+    },
+    {
+      "type": "object",
+      "required": ["questions"],
+      "additionalProperties": false,
+      "properties": {
+        "questions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/row" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "row": {
+      "type": "object",
+      "required": ["大题库", "题型", "题干", "答案"],
+      "additionalProperties": false,
+      "properties": {
+        "大题库": { "type": "string", "minLength": 1 },
+        "小题库": { "type": "string" },
+        "题型": { "enum": ["单选", "多选", "判断", "填空"] },
+        "题干": { "type": "string", "minLength": 1 },
+        "选项A": { "type": "string" },
+        "选项B": { "type": "string" },
+        "选项C": { "type": "string" },
+        "选项D": { "type": "string" },
+        "选项E": { "type": "string" },
+        "选项F": { "type": "string" },
+        "选项G": { "type": "string" },
+        "选项H": { "type": "string" },
+        "答案": { "type": "string", "minLength": 1 },
+        "可接受答案": { "type": "string" },
+        "解析": { "type": "string" },
+        "知识点": { "type": "string" },
+        "标签": { "type": "string" },
+        "难度": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "来源": { "type": "string" },
+        "排序号": { "type": "integer" }
+      }
+    }
+  }
+}

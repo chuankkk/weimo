@@ -6,9 +6,63 @@
 
 当前版本：**2.0.0**（localStorage schema v2，兼容 v1 数据）。
 
-[使用说明](./使用说明.md) · [GitHub 仓库](https://github.com/chuankkk/weimo) · [Releases](https://github.com/chuankkk/weimo/releases) · [MIT License](./LICENSE)
+[使用说明](./使用说明.md) · [题库制作指南](./题库制作指南.md) · [AI Skill](./.agents/skills/question-bank-builder/SKILL.md) · [GitHub 仓库](https://github.com/chuankkk/weimo) · [Releases](https://github.com/chuankkk/weimo/releases) · [MIT License](./LICENSE)
 
 ![闱墨首页](docs/screenshots/home-mobile.png)
+
+## 为什么是闱墨
+
+大多数刷题工具把题库、错题和学习记录锁在账号或云端；闱墨选择相反的路线：**题库属于你，数据留在本机**。
+
+- 不需要注册，不依赖网络，不收集学习数据。
+- 题库、作答、错题、笔记、模拟考试都在一个应用里，导入即可用。
+- 数据格式开放：CSV / Excel / JSON 导入导出，完整备份可迁移。
+- 视觉不是通用后台模板，而是“宣纸、玄墨、黛青、朱砂”的东方书卷气质。
+- 同一套代码同时提供 Web / PWA 与 Android 客户端。
+
+## 核心能力
+
+| 能力 | 说明 |
+| --- | --- |
+| 题库工作台 | 一级题库/子库、搜索筛选、分页、题目编辑、题库合并、Excel/CSV/JSON 导入导出 |
+| 四种练习 | 顺序、随机、智能加权、错题重刷；断点续做、答题解析、同题笔记 |
+| 错题回流 | 待复习/已掌握/已忽略、按题库与关键词筛选、单题/批量重刷、增量加载 |
+| 模拟考试 | 多题库蓝本组卷、限时作答、答题卡、自动交卷、题型报告、逐题复盘 |
+| 数据自主 | localStorage 本地优先、完整备份恢复、存储占用提示、无账号无遥测 |
+| 长页面导航 | 首页、练习、考试、我的、报告均有粘性页内跳转与回到顶部 |
+| AI 题库制作 | 内置 `question-bank-builder` skill、格式校验器、质量量表与提示词模板 |
+
+## 界面预览
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/home-mobile.png" width="240" alt="首页" /><br /><sub>首页 · 今日目标与快速开始</sub></td>
+    <td align="center"><img src="docs/screenshots/practice-setup.png" width="240" alt="练习配置" /><br /><sub>练习 · 模式、范围与题型</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/exam-report.png" width="240" alt="考试报告" /><br /><sub>考试 · 得分与逐题复盘</sub></td>
+    <td align="center"><img src="docs/screenshots/night-theme.png" width="240" alt="夜墨主题" /><br /><sub>夜墨 · 暗色阅读体验</sub></td>
+  </tr>
+</table>
+
+## 适合谁
+
+- 备考公务员、事业单位、考研、法考、教师资格、医考等考试，想自己掌控题库的人。
+- 教师、培训师、学习小组，需要把讲义/题库变成可练习应用的人。
+- 喜欢本地优先、无账号、可导出数据的工具控。
+- 想用 AI 批量生产题库，又需要严格格式与质量校验的人。
+
+## 技术栈
+
+| 层 | 选型 |
+| --- | --- |
+| UI | React 18 + TypeScript 5 |
+| 构建 | Vite 8、hash 路由、按页面拆分 CSS |
+| 状态 | React Context + `AppProvider`，派生索引用 `useMemo` |
+| 存储 | localStorage schema v2，旧数据自动归一化 |
+| 导入导出 | `read-excel-file` / `write-excel-file`，CSV/JSON 原生解析 |
+| 客户端 | Capacitor 8（Android），PWA + Service Worker |
+| 视觉 | 宣纸/玄墨/黛青/朱砂 token，自托管 Noto Sans/Serif SC |
 
 ## 2.0 版做了什么
 
@@ -155,7 +209,38 @@ APK 本身不包含用户数据。首次安装或清除应用数据后：标准�
 
 公开仓库不提交 APK 文件（`artifacts/` 与 `*.apk` 已忽略）。GitHub Releases 提供 debug 签名试用包；正式发布包请按上面的命令自行构建并使用自己的 keystore 签名。
 
-## 导入格式
+## 题库制作与 AI
+
+题库制作有一套独立的 [题库制作指南](./题库制作指南.md)，以及可被 AI Agent 直接加载的 [question-bank-builder skill](./.agents/skills/question-bank-builder/SKILL.md)：
+
+```text
+.agents/skills/question-bank-builder/
+├── SKILL.md                 # AI 工作流、格式硬约束、交付要求
+├── references/
+│   ├── import-format.md     # 字段/答案/CSV/JSON 完整规范
+│   ├── quality-rubric.md    # 100 分质量量表
+│   ├── prompts.md           # 可直接复制的提示词模板
+│   └── question-bank.schema.json
+├── scripts/validate-bank.mjs
+└── examples/sample-bank.csv|json
+```
+
+最短用法：
+
+```text
+使用 question-bank-builder skill，为「初中生物·光合作用」制作 20 道题。
+单选 10、多选 4、判断 4、填空 2；难度混合；输出 CSV，并用 --strict 校验通过。
+```
+
+校验器不依赖第三方库：
+
+```bash
+node .agents/skills/question-bank-builder/scripts/validate-bank.mjs 你的题库.csv --strict
+```
+
+它会检查单选题是否只有一个答案、多选答案键是否存在、填空空数与答案组数是否一致、是否有重复题、CSV 是否在单元格内换行、JSON 是否为完整备份等。完整字段、常见错误和 AI 工作流见 [题库制作指南](./题库制作指南.md)。
+
+### 导入格式速览
 
 可参考 `题库导入模板.csv`，也可以在“题库 → 导入导出”中直接下载模板。
 
@@ -170,6 +255,8 @@ APK 本身不包含用户数据。首次安装或清除应用数据后：标准�
 填空：第一空答案;第二空答案
 填空等价答案：北京|北京市;鲁迅|周树人
 ```
+
+CSV 一题一行，单元格内不能换行；含逗号的字段必须用双引号包裹。普通题库文件是合并导入，完整备份 JSON 才会覆盖数据。
 
 ## 验证
 
@@ -203,6 +290,20 @@ npm run build
 交互冒烟已验证：完整练习流程与总结、练习断点续做、错题单题重刷、考试倒计时自动交卷、答题卡交卷、考试报告、CSV 导入、完整备份恢复、Excel 导出、主题切换、320px 无横向溢出、空白版首次启动。
 
 Android 集成：`npm run android:debug` / `android:release` 与对应的 `:empty` 空白版命令均已在 JDK 21 + Gradle 8.11.1 下构建通过。
+
+## 文档索引
+
+| 文档 | 适合谁 | 内容 |
+| --- | --- | --- |
+| [使用说明](./使用说明.md) | 使用者 | 安装、导入、练习、错题、考试、备份、常见问题 |
+| [题库制作指南](./题库制作指南.md) | 出题人 / AI 使用者 | 蓝图设计、字段规范、四种题型、AI 工作流、验收清单 |
+| [question-bank-builder skill](./.agents/skills/question-bank-builder/SKILL.md) | AI Agent | 可加载的题库制作 skill、格式硬约束、交付流程 |
+| [题库格式完整说明](./.agents/skills/question-bank-builder/references/import-format.md) | 开发者 / 出题人 | 字段别名、答案解析、CSV/JSON 兼容性 |
+| [出题质量量表](./.agents/skills/question-bank-builder/references/quality-rubric.md) | 审校者 | 100 分评分表、单题自检、人工抽检 |
+| [AI 提示词模板](./.agents/skills/question-bank-builder/references/prompts.md) | AI 使用者 | 生成、转换、扩展、修复、组卷提示词 |
+| [闱墨UI设计系统](./闱墨UI设计系统.md) | 设计 / 前端 | 色彩、字体、组件、响应式与验收 |
+| [重设计验证方案](./刷题王重设计验证方案.md) | 测试 / 维护者 | 验证矩阵、交互冒烟、截图基线 |
+| [完整设计方案](./刷题App完整设计方案.md) | 产品 / 贡献者 | 产品定位、信息架构、领域模型、路线 |
 
 ## 参与贡献
 
