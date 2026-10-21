@@ -248,15 +248,13 @@ if (!report.rows) addError(1, "没有读取到任何题目行。");
 
 const seen = new Map();
 
-parsed.forEach(({ row, line }, index) => {
+parsed.forEach(({ row, line }) => {
   const rowErrors = [];
-  const rowWarnings = [];
   const pushError = (message) => {
     rowErrors.push(message);
     addError(line, message);
   };
   const pushWarning = (message) => {
-    rowWarnings.push(message);
     addWarning(line, message);
   };
 
@@ -343,9 +341,6 @@ parsed.forEach(({ row, line }, index) => {
     const difficulty = Number(getField(row, FIELDS.difficulty)) || 2;
     report.difficulties[difficulty] = (report.difficulties[difficulty] ?? 0) + 1;
   }
-
-  void index;
-  void rowWarnings;
 });
 
 report.passed = report.errors.length === 0 && (!strict || report.warnings.length === 0);
