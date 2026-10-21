@@ -8,30 +8,40 @@
   --font-sans: "Noto Sans SC Variable", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   --font-serif: "Noto Serif SC Variable", "Noto Serif SC", "Songti SC", "STSong", serif;
 
+  /* 纸与墨 */
   --paper: #f5f0e6;
   --paper-2: #eee7da;
+  --paper-3: #e7ddcc;
   --sheet: #fbf8f1;
   --sheet-raised: #fffdf8;
+  --sheet-glass: rgba(255, 253, 248, 0.88);
   --ink: #1c1f1c;
   --ink-2: #3e453f;
   --ink-3: #6d736c;
+  --ink-4: #8b9088;
   --line: #ded5c6;
   --line-strong: #c8bdab;
 
+  /* 黛青：主操作、选中 */
   --jade: #2c4b43;
   --jade-strong: #1e3932;
   --jade-soft: #e3eae4;
   --jade-tint: color-mix(in srgb, #2c4b43 8%, transparent);
+  --jade-line: color-mix(in srgb, #2c4b43 42%, #ded5c6);
   --on-jade: #fbf8f1;
 
+  /* 朱砂：品牌点、错误、危险 */
   --cinnabar: #a8463a;
   --cinnabar-strong: #8d382e;
   --cinnabar-soft: color-mix(in srgb, #a8463a 10%, transparent);
+  --cinnabar-line: color-mix(in srgb, #a8463a 38%, #ded5c6);
   --cinnabar-solid: #a8463a;
   --on-cinnabar: #fffaf5;
   --on-cinnabar-solid: #fffaf5;
 
+  /* 金泥 / 辅助色 */
   --gold: #86662f;
+  --gold-soft: color-mix(in srgb, #86662f 9%, transparent);
   --blue: #455d73;
   --success: #3f6657;
   --violet: #7b5c63;
@@ -41,19 +51,25 @@
   --type-gold: #7c5b29;
   --type-rose: #8e4a55;
 
+  /* 卷首 */
   --hero-bg: #223b34;
   --hero-text: #f8f2e7;
   --hero-muted: #c7d3c9;
   --hero-line: rgba(248, 242, 231, 0.18);
   --hero-seal: rgba(248, 242, 231, 0.08);
 
-  --focus: color-mix(in srgb, var(--jade) 55%, transparent);
+  --focus: color-mix(in srgb, var(--jade) 58%, transparent);
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--jade) 18%, transparent);
   --overlay: rgba(24, 28, 24, 0.46);
 
+  /* 阴影 */
+  --shadow-xs: 0 1px 2px rgba(45, 40, 30, 0.035);
   --shadow-sm: 0 1px 2px rgba(45, 40, 30, 0.04), 0 8px 22px rgba(45, 40, 30, 0.045);
   --shadow-md: 0 2px 6px rgba(45, 40, 30, 0.05), 0 16px 38px rgba(45, 40, 30, 0.08);
   --shadow-lg: 0 24px 70px rgba(30, 28, 22, 0.18);
+  --shadow-float: 0 10px 30px rgba(38, 34, 26, 0.12);
 
+  /* 圆角 */
   --radius-xs: 6px;
   --radius-sm: 9px;
   --radius-md: 12px;
@@ -62,24 +78,55 @@
   --radius-2xl: 28px;
   --radius-pill: 999px;
 
+  /* 动效 */
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 120ms;
   --dur: 180ms;
   --dur-slow: 320ms;
 
+  /* 排版 */
+  --text-2xs: 9.5px;
+  --text-xs: 10.5px;
+  --text-sm: 11.5px;
+  --text-base: 13px;
+  --text-md: 14px;
+  --text-lg: 16px;
+  --text-xl: 19px;
+  --text-2xl: 24px;
+  --text-hero: clamp(30px, 8.4vw, 50px);
+
+  /* 间距（4px 基线） */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* 布局 */
   --page-max: 1000px;
   --nav-offset: 88px;
+  --nav-height: 62px;
+  --glass-blur: 16px;
+  --section-offset: 96px;
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
   --paper: #111412;
   --paper-2: #191d19;
+  --paper-3: #20251f;
   --sheet: #1a1e1b;
   --sheet-raised: #222723;
+  --sheet-glass: rgba(34, 39, 35, 0.9);
   --ink: #f1eadc;
   --ink-2: #d5cdbf;
   --ink-3: #a9a294;
+  --ink-4: #8f897d;
   --line: #343a34;
   --line-strong: #4b5149;
 
@@ -87,16 +134,19 @@
   --jade-strong: #c7dccd;
   --jade-soft: #243029;
   --jade-tint: color-mix(in srgb, #a6bfb1 12%, transparent);
+  --jade-line: color-mix(in srgb, #a6bfb1 36%, #343a34);
   --on-jade: #10201a;
 
   --cinnabar: #de9482;
   --cinnabar-strong: #efb3a3;
   --cinnabar-soft: color-mix(in srgb, #de9482 13%, transparent);
+  --cinnabar-line: color-mix(in srgb, #de9482 38%, #343a34);
   --cinnabar-solid: #a34c3f;
   --on-cinnabar: #1b1210;
   --on-cinnabar-solid: #fff5ef;
 
   --gold: #cfb079;
+  --gold-soft: color-mix(in srgb, #cfb079 12%, transparent);
   --blue: #9fb6cb;
   --success: #93bba7;
   --violet: #c7a2ad;
@@ -112,10 +162,27 @@
   --hero-line: rgba(243, 236, 223, 0.16);
   --hero-seal: rgba(243, 236, 223, 0.07);
 
-  --focus: color-mix(in srgb, #a6bfb1 60%, transparent);
-  --overlay: rgba(5, 8, 6, 0.62);
+  --focus: color-mix(in srgb, #a6bfb1 62%, transparent);
+  --focus-ring: 0 0 0 3px color-mix(in srgb, #a6bfb1 22%, transparent);
+  --overlay: rgba(5, 8, 6, 0.66);
 
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.18);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2), 0 10px 26px rgba(0, 0, 0, 0.22);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.26), 0 20px 44px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 24px 70px rgba(0, 0, 0, 0.5);
+  --shadow-float: 0 12px 34px rgba(0, 0, 0, 0.42);
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --ink-3: #565c56;
+    --line: #c4b9a7;
+    --line-strong: #a99c88;
+  }
+
+  :root[data-theme="dark"] {
+    --ink-3: #c4bdaf;
+    --line: #4a514a;
+    --line-strong: #646c63;
+  }
 }

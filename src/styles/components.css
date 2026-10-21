@@ -15,7 +15,7 @@
     background var(--dur) var(--ease),
     border-color var(--dur) var(--ease),
     color var(--dur) var(--ease),
-    transform 120ms var(--ease),
+    transform var(--dur-fast) var(--ease),
     box-shadow var(--dur) var(--ease);
 }
 
@@ -49,6 +49,7 @@
   padding: 0 20px;
   border-radius: var(--radius-lg);
   font-size: 15px;
+  font-weight: 620;
 }
 
 .btn-lg svg {
@@ -62,16 +63,19 @@
 
 .btn-primary {
   border-color: var(--jade);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--jade) 88%, #ffffff) 0%, var(--jade) 100%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--jade) 86%, #ffffff) 0%, var(--jade) 62%, var(--jade-strong) 100%);
   color: var(--on-jade);
   box-shadow:
     0 8px 20px color-mix(in srgb, var(--jade) 20%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
 
 .btn-primary:hover:not(:disabled) {
   background: var(--jade-strong);
   border-color: var(--jade-strong);
+  box-shadow:
+    0 10px 26px color-mix(in srgb, var(--jade) 26%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .btn-secondary {
@@ -126,7 +130,7 @@
 }
 
 .btn:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.992);
 }
 
 .btn:disabled {
@@ -210,8 +214,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 30px 0 13px;
-  scroll-margin-top: 96px;
+  margin: 32px 0 14px;
+  scroll-margin-top: var(--section-offset);
 }
 
 .section-nav {
@@ -225,9 +229,9 @@
   padding: 4px;
   border: 1px solid color-mix(in srgb, var(--line) 84%, transparent);
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--sheet-raised) 90%, transparent);
+  background: var(--sheet-glass);
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(18px) saturate(1.18);
 }
 
 .section-nav-scroll {
@@ -253,7 +257,8 @@
   white-space: nowrap;
   transition:
     color var(--dur) var(--ease),
-    background var(--dur) var(--ease);
+    background var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
 }
 
 .section-nav-item:hover {
@@ -261,9 +266,9 @@
 }
 
 .section-nav-item.is-active {
-  background: var(--sheet);
+  background: var(--jade-tint);
   color: var(--jade);
-  box-shadow: 0 1px 4px rgba(35, 32, 25, 0.08);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--jade) 14%, transparent);
 }
 
 .section-nav-top {
@@ -275,6 +280,9 @@
   border-left: 1px solid var(--line);
   border-radius: 0 8px 8px 0;
   color: var(--ink-3);
+  transition:
+    background var(--dur) var(--ease),
+    color var(--dur) var(--ease);
 }
 
 .section-nav-top:hover {
@@ -290,12 +298,16 @@
 .section-glyph {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   flex: 0 0 auto;
-  border-radius: 9px;
-  background: var(--jade-tint);
+  border: 1px solid color-mix(in srgb, var(--jade) 12%, transparent);
+  border-radius: 10px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--jade) 12%, transparent), transparent 72%),
+    var(--sheet);
   color: var(--jade);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
 
 .section-glyph svg {
@@ -309,10 +321,10 @@
 }
 
 .section-copy h2 {
-  font-size: 18.5px;
-  font-weight: 620;
+  font-size: 19px;
+  font-weight: 640;
   letter-spacing: 0.04em;
-  line-height: 1.3;
+  line-height: 1.28;
 }
 
 .section-copy p {
@@ -497,14 +509,16 @@ button.chip:hover {
   overflow: hidden;
   border-radius: 999px;
   background: color-mix(in srgb, var(--line) 62%, transparent);
+  box-shadow: inset 0 1px 2px rgba(40, 36, 28, 0.06);
 }
 
 .progress > span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--jade) 72%, var(--line)), var(--jade));
-  transition: width 420ms var(--ease-out);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--jade) 68%, var(--line)), var(--jade));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--jade) 22%, transparent);
+  transition: width 480ms var(--ease-out);
 }
 
 .progress-sm {
@@ -593,8 +607,31 @@ button.chip:hover {
   padding: 13px 14px 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  background: var(--sheet);
+  background:
+    linear-gradient(150deg, color-mix(in srgb, var(--stat-accent, var(--jade)) 4%, transparent), transparent 58%),
+    var(--sheet);
   overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--stat-accent, transparent);
+  opacity: 0.55;
+}
+
+.stat-card:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .stat-top {
@@ -645,6 +682,22 @@ button.chip:hover {
   color: var(--ink-3);
   font-size: 10.5px;
   line-height: 1.5;
+}
+
+.stat-jade {
+  --stat-accent: var(--jade);
+}
+
+.stat-rose {
+  --stat-accent: var(--cinnabar);
+}
+
+.stat-gold {
+  --stat-accent: var(--gold);
+}
+
+.stat-blue {
+  --stat-accent: var(--blue);
 }
 
 .stat-jade .stat-value {
@@ -888,7 +941,10 @@ button.chip:hover {
 .segment.is-active {
   background: var(--sheet-raised);
   color: var(--jade);
-  box-shadow: 0 1px 4px rgba(35, 32, 25, 0.08);
+  box-shadow:
+    0 1px 2px rgba(35, 32, 25, 0.06),
+    0 4px 12px rgba(35, 32, 25, 0.05),
+    inset 0 0 0 1px color-mix(in srgb, var(--jade) 12%, transparent);
 }
 
 .segment.is-active b {
@@ -901,9 +957,10 @@ button.chip:hover {
   gap: 8px;
   align-items: flex-start;
   margin-top: 12px;
-  padding: 10px 12px;
+  padding: 10px 12px 10px 13px;
   border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+  border-left: 3px solid color-mix(in srgb, var(--jade) 45%, var(--line));
+  border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--jade) 5%, var(--sheet));
   color: var(--ink-3);
   font-size: 11.5px;
@@ -912,12 +969,14 @@ button.chip:hover {
 
 .notice-warn {
   border-color: color-mix(in srgb, var(--gold) 34%, var(--line));
+  border-left-color: var(--gold);
   background: color-mix(in srgb, var(--gold) 8%, var(--sheet));
   color: color-mix(in srgb, var(--gold) 84%, var(--ink));
 }
 
 .notice-success {
   border-color: color-mix(in srgb, var(--success) 34%, var(--line));
+  border-left-color: var(--success);
   background: color-mix(in srgb, var(--success) 7%, var(--sheet));
   color: var(--success);
 }
@@ -938,27 +997,46 @@ button.chip:hover {
 
 /* ---------- 空状态 ---------- */
 .empty-state {
+  position: relative;
   display: grid;
   place-items: center;
   gap: 7px;
-  padding: 38px 22px;
+  padding: 40px 22px;
   border: 1px dashed var(--line-strong);
   border-radius: var(--radius-xl);
   background:
-    radial-gradient(circle at 50% 20%, color-mix(in srgb, var(--jade) 5%, transparent), transparent 55%),
-    color-mix(in srgb, var(--sheet) 70%, transparent);
+    radial-gradient(circle at 50% 8%, color-mix(in srgb, var(--jade) 6%, transparent), transparent 52%),
+    color-mix(in srgb, var(--sheet) 72%, transparent);
   text-align: center;
+  overflow: hidden;
+}
+
+.empty-state::after {
+  content: "";
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  width: 180px;
+  height: 90px;
+  border: 1px solid color-mix(in srgb, var(--jade) 10%, transparent);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
 }
 
 .empty-icon {
+  position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   margin-bottom: 4px;
+  border: 1px solid color-mix(in srgb, var(--jade) 12%, transparent);
   border-radius: 50%;
   background: var(--jade-tint);
   color: var(--jade);
+  box-shadow: 0 0 0 7px color-mix(in srgb, var(--jade) 4%, transparent);
 }
 
 .empty-icon svg {
@@ -968,6 +1046,8 @@ button.chip:hover {
 }
 
 .empty-state strong {
+  position: relative;
+  z-index: 1;
   font-family: var(--font-serif);
   font-size: 16px;
   font-weight: 620;
@@ -975,6 +1055,8 @@ button.chip:hover {
 }
 
 .empty-state p {
+  position: relative;
+  z-index: 1;
   max-width: 360px;
   color: var(--ink-3);
   font-size: 12px;
@@ -982,6 +1064,8 @@ button.chip:hover {
 }
 
 .empty-action {
+  position: relative;
+  z-index: 1;
   margin-top: 8px;
 }
 
@@ -999,10 +1083,12 @@ button.chip:hover {
 }
 
 .toast {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: 9px;
-  padding: 10px 10px 10px 12px;
+  padding: 11px 10px 12px 12px;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--sheet-raised) 94%, transparent);
@@ -1013,6 +1099,27 @@ button.chip:hover {
   line-height: 1.5;
   pointer-events: auto;
   animation: toast-in 260ms var(--ease-out) both;
+}
+
+.toast-progress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: color-mix(in srgb, var(--jade) 55%, transparent);
+  transform-origin: left center;
+  animation-name: toast-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.toast-success .toast-progress {
+  background: color-mix(in srgb, var(--success) 60%, transparent);
+}
+
+.toast-error .toast-progress {
+  background: color-mix(in srgb, var(--cinnabar) 62%, transparent);
 }
 
 .toast p {
@@ -1035,6 +1142,10 @@ button.chip:hover {
 
 .toast-error {
   border-color: color-mix(in srgb, var(--cinnabar) 36%, var(--line));
+}
+
+.toast-success {
+  border-color: color-mix(in srgb, var(--success) 32%, var(--line));
 }
 
 .toast-error .toast-mark {
@@ -1091,11 +1202,11 @@ button.chip:hover {
   width: min(560px, 100%);
   max-height: min(88dvh, 900px);
   overflow: hidden;
-  border: 1px solid var(--line);
+  border: 1px solid color-mix(in srgb, var(--line) 88%, transparent);
   border-radius: var(--radius-xl);
   background: var(--sheet-raised);
   box-shadow: var(--shadow-lg);
-  animation: rise-in 260ms var(--ease-out) both;
+  animation: rise-in 280ms var(--ease-out) both;
 }
 
 .modal-sm {
@@ -1145,6 +1256,14 @@ button.chip:hover {
   color: var(--ink-3);
   font-size: 12px;
   line-height: 1.6;
+}
+
+.modal-body {
+  min-height: 0;
+  padding: 16px 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
 }
 
 .modal-sheet .modal-head {
@@ -1197,21 +1316,42 @@ button.chip:hover {
   display: flex;
   flex-direction: column;
   padding: 5px;
-  border: 1px solid color-mix(in srgb, var(--line) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
   border-radius: 18px;
-  background: color-mix(in srgb, var(--sheet-raised) 88%, transparent);
-  box-shadow: var(--shadow-md);
-  backdrop-filter: blur(18px) saturate(1.15);
+  background: color-mix(in srgb, var(--sheet-raised) 86%, transparent);
+  box-shadow:
+    var(--shadow-md),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(20px) saturate(1.18);
 }
 
 .nav-items {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 2px;
 }
 
+.nav-indicator {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  width: calc((100% - 10px) / 6);
+  border: 1px solid color-mix(in srgb, var(--jade) 12%, transparent);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--jade) 10%, transparent), transparent 94%),
+    color-mix(in srgb, var(--sheet-raised) 74%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  transform: translateX(calc(var(--nav-index, 0) * (100% + 2px)));
+  transition: transform 380ms var(--ease-out);
+  pointer-events: none;
+}
+
 .nav-item {
   position: relative;
+  z-index: 1;
   display: grid;
   justify-items: center;
   align-content: center;
@@ -1250,17 +1390,22 @@ button.chip:hover {
 
 .nav-item.is-active {
   color: var(--jade);
-  background: linear-gradient(180deg, var(--jade-tint), transparent 90%);
+  background: transparent;
+}
+
+.nav-item.is-active .nav-icon svg {
+  stroke-width: 1.95;
 }
 
 .nav-item.is-active::before {
   content: "";
   position: absolute;
-  top: 5px;
+  top: 4px;
   width: 4px;
   height: 4px;
   border-radius: 50%;
   background: var(--cinnabar);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cinnabar) 10%, transparent);
 }
 
 .nav-item:active {
@@ -1344,4 +1489,13 @@ button.chip:hover {
   color: var(--ink-3);
   font-size: 11px;
   text-align: left;
+}
+
+@keyframes toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
 }

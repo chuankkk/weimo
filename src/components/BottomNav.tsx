@@ -1,5 +1,5 @@
 import { BookOpen, ClipboardCheck, Home, Layers3, RotateCcw, UserRound } from "lucide-react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { TabKey } from "../types";
 import { APP_SLOGAN } from "../lib/constants";
 import { navigate } from "../lib/router";
@@ -15,6 +15,7 @@ const items: { tab: TabKey; label: string; icon: ReactNode }[] = [
 ];
 
 export function BottomNav({ active, dueCount }: { active: TabKey; dueCount: number }) {
+  const activeIndex = Math.max(0, items.findIndex((item) => item.tab === active));
   return (
     <nav className="bottom-nav" aria-label="主导航">
       <div className="nav-brand">
@@ -24,7 +25,8 @@ export function BottomNav({ active, dueCount }: { active: TabKey; dueCount: numb
           <span>{APP_SLOGAN}</span>
         </div>
       </div>
-      <div className="nav-items">
+      <div className="nav-items" style={{ "--nav-index": activeIndex } as CSSProperties}>
+        <span className="nav-indicator" aria-hidden="true" />
         {items.map((item) => {
           const isActive = active === item.tab;
           return (

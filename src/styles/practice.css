@@ -98,9 +98,11 @@
 .mode-card.is-active {
   border-color: color-mix(in srgb, var(--jade) 52%, var(--line));
   background:
-    linear-gradient(135deg, var(--jade-tint), transparent 62%),
+    linear-gradient(135deg, color-mix(in srgb, var(--jade) 9%, transparent), transparent 62%),
     var(--sheet);
-  box-shadow: inset 3px 0 0 var(--jade);
+  box-shadow:
+    inset 3px 0 0 var(--jade),
+    0 8px 20px color-mix(in srgb, var(--jade) 8%, transparent);
 }
 
 .mode-icon {
@@ -482,11 +484,13 @@
   align-items: center;
   gap: 10px;
   padding: 7px 8px;
-  border: 1px solid color-mix(in srgb, var(--line) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
   border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--sheet-raised) 90%, transparent);
-  box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(16px);
+  background: var(--sheet-glass);
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(18px) saturate(1.15);
 }
 
 .runner-title {
@@ -522,7 +526,7 @@
   padding: 5px 8px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--sheet);
+  background: color-mix(in srgb, var(--sheet) 92%, transparent);
   color: var(--ink-2);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
@@ -542,13 +546,49 @@
   letter-spacing: 0.02em;
 }
 
+/* 分段进度轨 */
+.runner-rail {
+  display: flex;
+  align-items: stretch;
+  gap: 3px;
+  width: 100%;
+  height: 12px;
+}
+
+.rail-cell {
+  position: relative;
+  min-width: 3px;
+  flex: 1;
+  padding: 0;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--line-strong) 62%, transparent);
+  transition:
+    background var(--dur) var(--ease),
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.rail-cell:hover {
+  background: color-mix(in srgb, var(--jade) 46%, var(--line-strong));
+  transform: scaleY(1.14);
+}
+
+.rail-cell.is-answered {
+  background: color-mix(in srgb, var(--jade) 68%, var(--line-strong));
+}
+
+.rail-cell.is-current {
+  background: var(--cinnabar);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--cinnabar) 18%, transparent);
+}
+
 .runner-progress {
   display: grid;
-  gap: 5px;
+  gap: 6px;
   margin: 12px 2px 14px;
 }
 
-.runner-progress > div {
+.runner-progress-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -557,7 +597,7 @@
   font-size: 10.5px;
 }
 
-.runner-progress button {
+.runner-progress-meta button {
   color: var(--jade);
   font-size: 10.5px;
   text-decoration: underline;
@@ -568,10 +608,13 @@
 .question-card {
   position: relative;
   padding: 18px 16px;
-  border: 1px solid var(--line);
+  border: 1px solid color-mix(in srgb, var(--line) 92%, transparent);
   border-radius: var(--radius-xl);
-  background: var(--sheet-raised);
-  box-shadow: var(--shadow-sm);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--sheet-raised) 88%, var(--sheet)), var(--sheet-raised));
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .question-meta {
@@ -647,15 +690,23 @@
   background: var(--sheet);
   color: var(--ink);
   text-align: left;
+  box-shadow: inset 0 0 0 0 transparent;
   transition:
     border-color var(--dur) var(--ease),
     background var(--dur) var(--ease),
-    transform 120ms var(--ease);
+    box-shadow var(--dur) var(--ease),
+    transform var(--dur-fast) var(--ease);
 }
 
 .option:hover:not(:disabled) {
   border-color: var(--line-strong);
   background: var(--sheet-raised);
+}
+
+.option:focus-visible {
+  border-color: var(--jade);
+  box-shadow: var(--focus-ring);
+  outline: none;
 }
 
 .option:active:not(:disabled) {
@@ -708,6 +759,7 @@
 .option.is-selected {
   border-color: color-mix(in srgb, var(--jade) 55%, var(--line));
   background: color-mix(in srgb, var(--jade) 7%, var(--sheet));
+  box-shadow: inset 3px 0 0 var(--jade);
 }
 
 .option.is-selected .option-key {
@@ -719,6 +771,7 @@
 .option.is-correct {
   border-color: color-mix(in srgb, var(--success) 55%, var(--line));
   background: color-mix(in srgb, var(--success) 8%, var(--sheet));
+  box-shadow: inset 3px 0 0 var(--success);
 }
 
 .option.is-correct .option-key {
@@ -730,6 +783,7 @@
 .option.is-wrong {
   border-color: color-mix(in srgb, var(--cinnabar) 50%, var(--line));
   background: color-mix(in srgb, var(--cinnabar) 7%, var(--sheet));
+  box-shadow: inset 3px 0 0 var(--cinnabar);
 }
 
 .option.is-wrong .option-key {
@@ -1066,11 +1120,13 @@
   align-items: center;
   gap: 8px;
   padding: 8px;
-  border: 1px solid color-mix(in srgb, var(--line) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
   border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--sheet-raised) 90%, transparent);
-  box-shadow: var(--shadow-md);
-  backdrop-filter: blur(16px);
+  background: var(--sheet-glass);
+  box-shadow:
+    var(--shadow-md),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(18px) saturate(1.15);
 }
 
 .runner-actions .btn {
@@ -1083,6 +1139,32 @@
 
 .runner-primary {
   flex: 1;
+}
+
+.runner-primary.is-counting {
+  position: relative;
+  overflow: hidden;
+}
+
+.runner-primary.is-counting::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: color-mix(in srgb, var(--on-jade) 60%, transparent);
+  transform-origin: left center;
+  animation: auto-next-progress 1.4s linear forwards;
+}
+
+@keyframes auto-next-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
 }
 
 .auto-next-hint {
@@ -1111,14 +1193,21 @@
   align-items: center;
   gap: 18px;
   margin-top: 4px;
-  padding: 24px 18px;
-  border: 1px solid var(--line);
+  padding: 26px 18px;
+  border: 1px solid color-mix(in srgb, var(--line) 88%, transparent);
   border-radius: var(--radius-2xl);
   background:
-    radial-gradient(circle at 82% 12%, color-mix(in srgb, var(--gold) 10%, transparent), transparent 46%),
+    radial-gradient(circle at 82% 8%, color-mix(in srgb, var(--gold) 12%, transparent), transparent 46%),
+    radial-gradient(circle at 12% 92%, color-mix(in srgb, var(--jade) 8%, transparent), transparent 44%),
     var(--sheet);
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
   text-align: center;
+}
+
+.summary-ring .ring {
+  filter: drop-shadow(0 8px 20px color-mix(in srgb, var(--jade) 12%, transparent));
 }
 
 .summary-copy h1 {

@@ -1,7 +1,6 @@
 import type { Question, QuestionOption, QuestionType } from "../types";
 
-export const uid = (prefix = "id") =>
-  `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+export const uid = (prefix = "id") => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
 /** 组合 className，过滤空值。 */
 export const cn = (...values: (string | false | null | undefined)[]) => values.filter(Boolean).join(" ");
@@ -86,13 +85,6 @@ export const formatUserAnswer = (question: Question, answer: string[]) => {
   return answer.join("、");
 };
 
-export const formatPercent = (value: number, digits = 0) => `${(value * 100).toFixed(digits)}%`;
-
-export const truncate = (text: string, max = 120) =>
-  text.length > max ? `${text.slice(0, max).trimEnd()}…` : text;
-
-export const plural = (count: number, unit: string) => `${count} ${unit}`;
-
 export const formatFileSize = (bytes: number) => {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -101,22 +93,3 @@ export const formatFileSize = (bytes: number) => {
 
 export const estimateMinutes = (count: number, secondsPerQuestion = 45) =>
   Math.max(1, Math.round((count * secondsPerQuestion) / 60));
-
-export const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-/** 在文本中高亮搜索关键词，返回片段数组。 */
-export const highlightParts = (text: string, keyword: string) => {
-  const query = keyword.trim();
-  if (!query) return [{ text, match: false }];
-  const parts: { text: string; match: boolean }[] = [];
-  const regex = new RegExp(`(${escapeRegExp(query)})`, "gi");
-  let cursor = 0;
-  for (const match of text.matchAll(regex)) {
-    const index = match.index ?? 0;
-    if (index > cursor) parts.push({ text: text.slice(cursor, index), match: false });
-    parts.push({ text: match[0], match: true });
-    cursor = index + match[0].length;
-  }
-  if (cursor < text.length) parts.push({ text: text.slice(cursor), match: false });
-  return parts.length ? parts : [{ text, match: false }];
-};

@@ -1,9 +1,9 @@
+import { useMemo } from "react";
 import { Capacitor } from "@capacitor/core";
 import {
   BookOpen,
   CheckCircle2,
   Database,
-  Download,
   HardDrive,
   Info,
   Moon,
@@ -17,6 +17,7 @@ import {
   Trash2
 } from "lucide-react";
 import { useApp } from "../store/AppStore";
+import { clearStudyRecords } from "../store/actions";
 import { storageUsage } from "../data/storage";
 import { formatFileSize } from "../lib/text";
 import { useDocumentTitle } from "../lib/hooks";
@@ -26,6 +27,7 @@ import { DataTools } from "../components/DataTools";
 import {
   Button,
   Chip,
+  PageHeader,
   SectionHead,
   SectionNav,
   StatCard,
@@ -46,6 +48,16 @@ export function SettingsPage() {
   const { state, stats, catalog, update, setSetting, reset, toast, confirm } = useApp();
   const native = Capacitor.isNativePlatform();
   const used = storageUsage();
+  const composition = useMemo(() => {
+    const parts = [
+      { key: "questions", label: "题目", value: state.questions.length, tone: "jade" },
+      { key: "records", label: "作答", value: state.records.length, tone: "blue" },
+      { key: "wrongs", label: "错题", value: state.wrongs.length, tone: "rose" },
+      { key: "notes", label: "笔记", value: state.notes.length, tone: "gold" }
+    ];
+    const total = parts.reduce((sum, part) => sum + part.value, 0);
+    return { total, parts: parts.map((part) => ({ ...part, percent: total ? (part.value / total) * 100 : 0 })) };
+  }, [state.questions.length, state.records.length, state.wrongs.length, state.notes.length]);
 
   const clearProgress = async () => {
     const accepted = await confirm({
@@ -55,14 +67,7 @@ export function SettingsPage() {
       tone: "danger"
     });
     if (!accepted) return;
-    update((current) => ({
-      ...current,
-      records: [],
-      wrongs: [],
-      notes: [],
-      examSessions: [],
-      practiceSession: null
-    }));
+    update(clearStudyRecords);
     toast("学习记录已清空", { tone: "success" });
   };
 
@@ -79,13 +84,7 @@ export function SettingsPage() {
 
   return (
     <section className="page settings-page">
-      <div className="page-head">
-        <div className="page-head-copy">
-          <p className="eyebrow">我的</p>
-          <h1>我的闱墨</h1>
-          <p className="page-head-sub">外观、学习偏好与本地数据，都由你掌握。</p>
-        </div>
-      </div>
+      <PageHeader eyebrow="我的" title="我的闱墨" subtitle="外观、学习偏好与本地数据，都由你掌握。" />
 
       <SectionNav
         items={[
@@ -238,6 +237,35 @@ export function SettingsPage() {
           <StatCard label="错题" value={stats.wrongActive} unit="道" tone="rose" hint={`已掌握 ${stats.wrongMastered}`} />
           <StatCard label="考试记录" value={state.examSessions.filter((item) => item.status !== "running").length} unit="场" tone="gold" />
         </div>
+        {composition.total ? (
+          <div className="storage-composition">
+            <div
+              className="storage-bar"
+              role="img"
+              aria-label={composition.parts.map((part) => `${part.label} ${part.value}`).join("，")}
+            >
+              {composition.parts.map((part) =>
+                part.value ? (
+                  <span
+                    key={part.key}
+                    className={`is-${part.tone}`}
+                    style={{ width: `${part.percent}%` }}
+                    title={`${part.label} ${part.value}`}
+                  />
+                ) : null
+              )}
+            </div>
+            <div className="storage-legend">
+              {composition.parts.map((part) => (
+                <span key={part.key}>
+                  <i className={`is-${part.tone}`} aria-hidden="true" />
+                  {part.label} <b>{part.value}</b>
+                </span>
+              ))}
+              <small>按条目数统计</small>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <DataTools />
@@ -258,7 +286,7 @@ export function SettingsPage() {
             <strong>恢复演示数据</strong>
             <small>用内置演示题库替换当前全部数据，请先导出完整备份</small>
           </span>
-          <Button variant="danger" icon={<Download />} onClick={() => void resetAll()}>
+          <Button variant="danger" icon={<RotateCcw />} onClick={() => void resetAll()}>
             恢复演示
           </Button>
         </div>

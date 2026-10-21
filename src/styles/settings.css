@@ -2,15 +2,19 @@
    我的
    ============================================================ */
 .profile-card {
+  position: relative;
+  isolation: isolate;
   display: flex;
   align-items: center;
   gap: 14px;
   margin: 4px 0 20px;
+  overflow: hidden;
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: var(--radius-xl);
   background:
-    linear-gradient(130deg, var(--jade-tint), transparent 62%),
+    radial-gradient(circle at 88% -10%, color-mix(in srgb, var(--gold) 12%, transparent), transparent 48%),
+    linear-gradient(130deg, color-mix(in srgb, var(--jade) 7%, transparent), transparent 62%),
     var(--sheet);
   box-shadow: var(--shadow-sm);
 }
@@ -163,7 +167,7 @@
 }
 
 .theme-preview.is-system {
-  background: linear-gradient(100deg, #f5f0e6 50%, #151816 50%);
+  background: linear-gradient(90deg, #f5f0e6 0 50%, #151816 50% 100%);
   color: #7b8a7f;
 }
 
@@ -374,6 +378,94 @@
   display: none;
 }
 
+.storage-composition {
+  display: grid;
+  gap: 8px;
+  margin-top: 13px;
+  padding-top: 13px;
+  border-top: 1px solid var(--line);
+}
+
+.storage-bar {
+  display: flex;
+  gap: 2px;
+  height: 9px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--line) 50%, transparent);
+}
+
+.storage-bar > span {
+  min-width: 3px;
+  border-radius: 3px;
+}
+
+.storage-bar .is-jade {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--jade) 70%, transparent), var(--jade));
+}
+
+.storage-bar .is-blue {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--blue) 60%, transparent), var(--blue));
+}
+
+.storage-bar .is-rose {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--cinnabar) 55%, transparent), var(--cinnabar));
+}
+
+.storage-bar .is-gold {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--gold) 55%, transparent), var(--gold));
+}
+
+.storage-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 12px;
+  color: var(--ink-3);
+  font-size: 9.5px;
+}
+
+.storage-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.storage-legend i {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+}
+
+.storage-legend i.is-jade {
+  background: var(--jade);
+}
+
+.storage-legend i.is-blue {
+  background: var(--blue);
+}
+
+.storage-legend i.is-rose {
+  background: var(--cinnabar);
+}
+
+.storage-legend i.is-gold {
+  background: var(--gold);
+}
+
+.storage-legend b {
+  margin-left: 1px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.storage-legend small {
+  margin-left: auto;
+  font-size: 9px;
+  opacity: 0.8;
+}
+
 .maintenance-card {
   padding: 0 15px;
 }
@@ -499,3 +591,33 @@
   height: 12px;
 }
 
+
+/* ---------- v2.2 视觉强化 ---------- */
+.theme-card {
+  transition:
+    border-color var(--dur) var(--ease),
+    background var(--dur) var(--ease),
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.theme-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.settings-card,
+.maintenance-card,
+.storage-card {
+  box-shadow: var(--shadow-xs);
+}
+
+.settings-note {
+  border-left: 2px solid color-mix(in srgb, var(--jade) 32%, var(--line));
+  border-radius: var(--radius-sm);
+}
+
+.settings-footnote {
+  font-variant-numeric: tabular-nums;
+}

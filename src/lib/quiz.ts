@@ -1,11 +1,6 @@
-import type {
-  AppState,
-  Question,
-  QuestionEvaluation,
-  WrongQuestion
-} from "../types";
-import { addDaysIso, daysSince, nowIso } from "./date";
-import { normalizeAnswerToken, uid } from "./text";
+import type { Question, QuestionEvaluation, WrongQuestion } from "../types";
+import { addDaysIso, daysSince } from "./date";
+import { normalizeAnswerToken } from "./text";
 
 /**
  * 判题：选择题比较集合，填空题逐空比较并支持等价答案。
@@ -23,11 +18,21 @@ export const evaluateQuestion = (question: Question, answer: string[]): Question
         const aliases = (question.answerAliases[index] ?? []).map(normalizeAnswerToken).filter(Boolean);
         return [expected, ...aliases].includes(normalizedUserAnswer[index]);
       });
+    const mismatch = normalizedAnswer.findIndex((expected, index) => {
+      const aliases = (question.answerAliases[index] ?? []).map(normalizeAnswerToken).filter(Boolean);
+      return ![expected, ...aliases].includes(normalizedUserAnswer[index] ?? "");
+    });
     return {
       isCorrect,
       normalizedUserAnswer,
       normalizedAnswer,
-      detail: isCorrect ? "填空答案匹配" : "填空答案与标准答案不一致"
+      detail: isCorrect
+        ? "填空答案匹配"
+        : normalizedUserAnswer.length !== normalizedAnswer.length
+          ? `填写了 ${normalizedUserAnswer.length} 个空，标准答案有 ${normalizedAnswer.length} 个空`
+          : mismatch >= 0
+            ? `第 ${mismatch + 1} 空与标准答案不一致`
+            : "填空答案与标准答案不一致"
     };
   }
 
@@ -38,11 +43,24 @@ export const evaluateQuestion = (question: Question, answer: string[]): Question
     sortedUser.length === sortedExpected.length &&
     sortedExpected.every((item, index) => item === sortedUser[index]);
 
+  let detail = isCorrect ? "答案完全一致" : "答案不一致";
+  if (!isCorrect) {
+    if (!sortedUser.length) {
+      detail = "尚未选择答案";
+    } else if (question.type === "multiple") {
+      const missing = sortedExpected.filter((item) => !sortedUser.includes(item)).length;
+      const extra = sortedUser.filter((item) => !sortedExpected.includes(item)).length;
+      if (missing && !extra) detail = `少选了 ${missing} 个正确选项`;
+      else if (!missing && extra) detail = `多选了 ${extra} 个选项`;
+      else if (missing && extra) detail = `少选 ${missing} 个正确选项，多选 ${extra} 个错误选项`;
+    }
+  }
+
   return {
     isCorrect,
     normalizedUserAnswer: sortedUser,
     normalizedAnswer: sortedExpected,
-    detail: isCorrect ? "答案完全一致" : "答案不一致"
+    detail
   };
 };
 
@@ -169,34 +187,4 @@ export const updateWrongAfterAnswer = (
       nextReviewAt: addDaysIso(answeredAt, 1)
     }
   ];
-};
-
-export const isPracticeFinished = (session: NonNullable<AppState["practiceSession"]>) =>
-  Boolean(session.completedAt) || session.currentIndex >= session.questionIds.length;
-
-export const createStudyRecord = (
-  question: Question,
-  sessionId: string,
-  mode: "sequence" | "random" | "weighted" | "wrong" | "exam",
-  userAnswer: string[],
-  score: number,
-  timeSpentMs: number
-) => {
-  const answeredAt = nowIso();
-  const evaluation = evaluateQuestion(question, userAnswer);
-  return {
-    record: {
-      id: uid("record"),
-      questionId: question.id,
-      sessionId,
-      mode,
-      userAnswer,
-      isCorrect: evaluation.isCorrect,
-      score,
-      timeSpentMs: Math.max(0, timeSpentMs),
-      answeredAt
-    },
-    evaluation,
-    answeredAt
-  } as const;
 };

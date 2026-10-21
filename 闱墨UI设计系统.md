@@ -1,6 +1,6 @@
 # 闱墨 UI 设计系统
 
-更新时间：2026-10-21 · 版本 2.0
+更新时间：2026-10-22 · 版本 2.2
 
 ## 1. 品牌定位
 
@@ -151,7 +151,40 @@ Materials/textures: authentic rice-paper grain, dry brush, watery ink diffusion
 Constraints: no text, no Chinese characters, no logos, no people, no watermark; no 3D rendering, no glossy objects, no UI mockup, no photorealism, no bright teal, no saturated gradients; preserve ample negative space and a clean silhouette for mobile use
 ```
 
-## 9. 验收证据
+## 9. v2.2 视觉增量
+
+### 1. 令牌与层级
+
+- 在原有色板外补充 `--paper-3`、`--sheet-glass`、`--ink-4`、`--jade-line`、`--cinnabar-line`、`--gold-soft`，用于玻璃底、弱文字与语义描边。
+- 新增 `--shadow-xs` / `--shadow-float`、`--dur-fast`、`--text-2xs`～`--text-2xl`、`--space-1`～`--space-12`、`--section-offset` 与 `--glass-blur`。
+- 增加 `prefers-contrast: more`：提高弱文字与界格线对比度，不改变品牌色相。
+- 普通卡片从明显投影改为 `--shadow-xs`，仅交互悬停、浮层与固定操作条使用更重阴影。
+
+### 2. 新组件
+
+- **今日安排卡（`.home-brief`）**：卷首下方的单行建议，按“继续练习 → 今日复习 → 补足目标 → 模拟考试”的优先级展示；移动端两行网格，桌面端三列。
+- **分段进度轨（`.runner-rail` / `.rail-cell`）**：练习作答页每题一个方格，未答为界格色，已答为黛青，当前为朱砂；超过 48 题退回连续进度条。
+- **底栏滑动指示器（`.nav-indicator`）**：6 等分背景块随 `--nav-index` 平移，选中项保留朱砂点与加粗图标；桌面侧栏隐藏。
+- **Toast 倒计时（`.toast-progress`）**：按 `duration` 动画缩放的 2px 进度线，成功/错误使用松绿/朱砂。
+- **存储构成条（`.storage-bar` / `.storage-legend`）**：题目/作答/错题/笔记四色分段，附条目数与图例。
+- **题库进度（`.bank-card-progress`）**：卡片底部显示已练/总题数与进度条；目录新增排序下拉（`.catalog-sort`）。
+- **未作答中性态（`.report-row.is-unanswered`）**：考试报告的未答题使用灰色减号与弱化分数，避免与“错误”混淆。
+
+### 3. 版式与细节
+
+- 标题、题干使用 `text-wrap: balance` / `pretty`，长句断行更自然。
+- 卡片左侧用 2px 品类色条区分指标（`.stat-card::before`），图标底色随练习模式变化（顺序黛青 / 随机蓝 / 智能金 / 错题朱砂）。
+- 页内导航的当前项改为黛青浅底与内描边；空状态增加纸纹弧线与双层圆环图标。
+- 练习选项选中/正确/错误均带 3px 内嵌色条，选择题字母块同步变色。
+- 新增 `--section-offset`，页内导航跳转与 `scroll-margin-top` 统一为 96px。
+
+### 4. 验收
+
+- `npm test`：20 组纯逻辑回归。
+- `npm run smoke`：20 项 CDP 交互检查（练习完成、题库详情、导入视图、主题切换、考试答题卡与退出、CSV 导入、备份恢复、回收站、无运行时错误）。
+- `node scripts/ui-shot.mjs`：320 / 412 / 760 / 1100 / 1440px 截图，支持 `--dark` 与页面内交互脚本。
+
+## 10. 验收证据
 
 视觉验收图位于 `docs/screenshots/`：
 
@@ -167,4 +200,4 @@ Constraints: no text, no Chinese characters, no logos, no people, no watermark; 
 - `android-runtime.png`、`android-empty.png`（Android 模拟器 1080×2400）
 - `home-baseline.png`（首页视觉基线）
 
-工程验收：`npx tsc --noEmit`、`npm run build`、生产预览加载；交互冒烟覆盖练习完成、断点续做、左右滑动切题、题库删除/恢复、合并撤销、回收站彻底删除、按题库导出错题本/笔记、考试自动交卷、答题卡交卷、报告、CSV 导入、完整备份恢复、Excel 导出与主题切换。
+工程验收：`npx tsc --noEmit`、`npm test`、`npm run build`、`npm run smoke`、生产预览加载；交互冒烟覆盖练习完成、断点续做、左右滑动切题、题库删除/恢复、合并撤销、回收站彻底删除、按题库导出错题本/笔记、考试自动交卷、答题卡交卷、报告、CSV 导入、完整备份恢复、Excel 导出与主题切换。

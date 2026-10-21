@@ -4,6 +4,7 @@ import { Share } from "@capacitor/share";
 import type { AppState, ImportReport, Question, QuestionBank, QuestionOption, QuestionType } from "../types";
 import { getRootIdForBank } from "../lib/banks";
 import { nowIso } from "../lib/date";
+import { csvToObjects, parseCsv } from "../lib/csv";
 import { makeFingerprint, parseAnswerText, parseAliasesText, splitList, uid } from "../lib/text";
 import { normalizeState } from "./storage";
 
@@ -111,33 +112,7 @@ const rowsToObjects = (rows: unknown[][]) => {
   });
 };
 
-const parseCsvLine = (line: string) => {
-  const values: string[] = [];
-  let current = "";
-  let quoted = false;
-  for (let index = 0; index < line.length; index += 1) {
-    const char = line[index];
-    const next = line[index + 1];
-    if (char === '"' && quoted && next === '"') {
-      current += '"';
-      index += 1;
-    } else if (char === '"') {
-      quoted = !quoted;
-    } else if (char === "," && !quoted) {
-      values.push(current);
-      current = "";
-    } else {
-      current += char;
-    }
-  }
-  values.push(current);
-  return values;
-};
-
-const parseRowsFromCsv = (text: string) => {
-  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter((line) => line.trim());
-  return rowsToObjects(lines.map(parseCsvLine));
-};
+const parseRowsFromCsv = (text: string) => csvToObjects(parseCsv(text));
 
 const mergeRows = (
   state: AppState,

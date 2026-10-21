@@ -11,6 +11,9 @@ test-home.png
 *.apk
 *.aab
 
+# Build/test scratch
+.tmp/
+
 # Android local configuration and build output
 android/local.properties
 android/keystore.properties

@@ -1,0 +1,21 @@
+/* ui-shot 页面脚本：由 scripts/ui-shot.mjs --script 注入执行，支持顶层 await 与 return。 */
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+location.hash = "#/banks";
+await sleep(600);
+const before = document.querySelectorAll(".bank-card").length;
+const firstName = document.querySelector(".bank-card-title strong")?.textContent.trim() ?? "";
+document.querySelector(".bank-card")?.click();
+await sleep(500);
+const deleteButtons = document.querySelectorAll(".detail-head-actions .icon-btn");
+deleteButtons[deleteButtons.length - 1]?.click();
+await sleep(400);
+[...document.querySelectorAll(".modal-foot .btn")].find((button) => button.textContent.includes("移入回收站"))?.click();
+await sleep(700);
+const trashCount = document.querySelectorAll(".trash-card").length;
+const trashTitle = document.querySelector(".modal-head h2")?.textContent ?? "";
+document.querySelector(".trash-actions .btn")?.click();
+await sleep(700);
+location.hash = "#/banks";
+await sleep(500);
+const after = document.querySelectorAll(".bank-card").length;
+return { before, after, firstName, trashCount, trashTitle, restored: after === before };

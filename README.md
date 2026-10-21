@@ -4,7 +4,7 @@
 
 > 一卷一答，墨见真知。
 
-当前版本：**2.1.0**（localStorage schema v2，兼容 v1 数据）。
+当前版本：**2.2.0**（localStorage schema v2，兼容 v1 数据）。
 
 [使用说明](./使用说明.md) · [题库制作指南](./题库制作指南.md) · [AI Skill](./.agents/skills/question-bank-builder/SKILL.md) · [GitHub 仓库](https://github.com/chuankkk/weimo) · [Releases](https://github.com/chuankkk/weimo/releases) · [MIT License](./LICENSE)
 
@@ -24,11 +24,11 @@
 
 | 能力 | 说明 |
 | --- | --- |
-| 题库工作台 | 一级题库/子库、搜索筛选、分页、题目编辑、题库合并、回收站恢复、Excel/CSV/JSON 导入导出 |
-| 四种练习 | 顺序、随机、智能加权、错题重刷；断点续做、答题解析、同题笔记、提交后左右滑动切题 |
-| 错题回流 | 待复习/已掌握/已忽略、按题库与关键词筛选、单题/批量重刷、增量加载、按题库导出 A4 错题本与笔记 |
-| 模拟考试 | 多题库蓝本组卷、限时作答、答题卡、自动交卷、题型报告、逐题复盘 |
-| 数据自主 | localStorage 本地优先、完整备份恢复、存储占用提示、无账号无遥测 |
+| 题库工作台 | 一级题库/子库、搜索排序、练习进度、分页、题目编辑、题库合并、回收站恢复、Excel/CSV/JSON 导入导出 |
+| 四种练习 | 顺序、随机、智能加权、错题重刷；断点续做、分段进度轨跳题、即时解析、同题笔记、提交后左右滑动切题 |
+| 错题回流 | 待复习/已掌握/已忽略、今日复习、按题库与关键词筛选、单题/批量重刷、增量加载、按题库导出 A4 错题本与笔记 |
+| 模拟考试 | 多题库蓝本组卷、限时作答、答题卡、自动交卷、题型报告、未作答中性标记、逐题复盘 |
+| 数据自主 | localStorage 本地优先、完整备份恢复、损坏数据保留、存储构成、无账号无遥测 |
 | 长页面导航 | 首页、练习、考试、我的、报告均有粘性页内跳转与回到顶部 |
 | AI 题库制作 | 配套 `question-bank-builder` skill、格式校验器、质量量表与提示词模板 |
 
@@ -58,11 +58,34 @@
 | --- | --- |
 | UI | React 18 + TypeScript 5 |
 | 构建 | Vite 8、hash 路由、按页面拆分 CSS |
-| 状态 | React Context + `AppProvider`，派生索引用 `useMemo` |
-| 存储 | localStorage schema v2，旧数据自动归一化 |
-| 导入导出 | `read-excel-file` / `write-excel-file`，CSV/JSON 原生解析 |
+| 状态 | React Context（数据/操作 + UI 反馈双 Context），派生索引用 `useMemo` |
+| 存储 | localStorage schema v2，旧数据自动归一化，损坏副本保留 |
+| 导入导出 | `read-excel-file` / `write-excel-file`，自研 CSV 解析（支持引号内换行） |
 | 客户端 | Capacitor 8（Android），PWA + Service Worker |
-| 视觉 | 宣纸/玄墨/黛青/朱砂 token，自托管 Noto Sans/Serif SC |
+| 视觉 | 宣纸/玄墨/黛青/朱砂 token，自托管 Noto Sans/Serif SC，响应式与夜墨主题 |
+| 验证 | `npm test`（纯逻辑）+ `npm run smoke`（CDP 全流程）+ `scripts/ui-shot.mjs`（多尺寸截图） |
+
+## 2.2 新增：结构再拆分与阅读体验
+
+### 架构与可靠性
+
+- **页面按业务再拆分**：练习、考试、题库分别拆到 `pages/practice`、`pages/exam`、`pages/banks`，错题卡独立为 `pages/wrong/WrongCard`；最大的页面文件从 1,100 行降到 530 行以内，练习/题库/报告子页多在 350 行以内。
+- **状态层拆分**：`AppStore` 拆为数据/操作与 UI 反馈两个 Context，Toast、确认弹窗变化不再连带所有页面重渲染；操作函数引用稳定。
+- **数据层拆分**：归一化迁至 `data/normalize.ts`，种子默认值单例缓存；保存时统一写入 `schemaVersion`。
+- **CSV 解析器重写**：支持 BOM、CRLF、引号转义、引号内换行；Excel / CSV / JSON 导入共用同一套校验与去重。
+- **数据安全**：本地数据解析失败时先把原文另存为 `shuati-wang-state-v1.corrupt`，避免随后的自动保存覆盖；删除深层题库的题目时正确回填根题库；删除单题保留当前题号；记录按作答时间归一化。
+- **纯逻辑测试**：新增 `tests/logic.test.ts`，覆盖判题、CSV、目录索引、回收站/合并、统计、组卷交卷、错题本转义等 20 组断言；`npm test` 秒级运行。
+- **一键冒烟**：`npm run smoke` 自动构建、复用/启动预览服务，用 Chrome DevTools Protocol 跑完练习、题库、主题、考试、CSV 导入、备份恢复、回收站等 20 项交互检查。
+
+### 阅读与操作体验
+
+- **首页今日安排**：在卷首下方新增“今日安排”卡，按当前状态推荐继续练习、今日复习、补足目标或模拟考试，并显示目标进度。
+- **练习分段进度轨**：每题一个可点击方格，已答/当前/未答一眼可见；超过 48 题自动退回连续进度条。
+- **题库进度与排序**：题库卡片显示练习进度、错题数和题型分布，目录支持按题量/进度/错题/名称排序；详情页统计已练覆盖率。
+- **今日复习**：错题本顶部一键抽取当前范围内全部到期错题，最多 50 题，直接进入重刷。
+- **更准确的多选反馈**：多选部分正确时提示“少选了 N 个正确选项 / 多选了 N 个选项”；填空错误定位到具体第几空。
+- **考试报告**：未作答题目使用中性标记，不再被误认为“错误”；逐题回顾可展开答案与解析。
+- **视觉细节**：新增底栏滑动指示器、Toast 倒计时进度、存储构成条、空状态纸纹装饰、标题卡左侧品类色条、分段进度轨与更克制的纸面阴影；夜墨与高对比度偏好同步适配。
 
 ## 2.1 新增：回收站与滑动手势
 
@@ -90,7 +113,7 @@
 - 加权随机从 O(n²) 改为 Efraimidis–Spirakis 指数键 O(n log n)；顺序模式只排序一次。
 - 知识点错误率、统计、题型正确率改为单次遍历，避免 `记录 × 题目` 嵌套扫描。
 - 搜索使用 `useDeferredValue`，大题库输入不卡顿。
-- localStorage 保存改为 240ms 防抖，并在 `pagehide`/页面隐藏时立即落盘。
+- localStorage 保存改为 280ms 防抖，并在 `pagehide`/页面隐藏时立即落盘。
 - Excel/CSV 解析与导出库改为动态 import，只在导入/导出时加载对应 chunk。
 - 首页主视觉从 2.4 MB PNG 压缩为 243 KB JPEG，并提供 115 KB 的 1200px 响应式版本；删除两张大体积未使用图片。
 - 大题量列表分页（题库详情每页 20 题）、按需筛选，避免一次渲染全部题目。
@@ -131,17 +154,19 @@ src/
   lib/
     catalog.ts            # 题库/题目索引与题目池缓存
     quiz.ts               # 判题、抽题、加权抽样、错题掌握度
-    stats.ts              # 统计、知识点弱项、错题行
+    stats.ts              # 统计、题库进度、知识点弱项、错题行
     exam.ts               # 组卷、倒计时、交卷、成绩
-    banks.ts              # 题库路径与小工具
+    banks.ts / session.ts # 题库路径、练习会话工厂
+    csv.ts                # 支持引号换行的 CSV 解析
     date.ts / text.ts     # 日期、归一化、格式化
     router.ts / hooks.ts  # hash 路由、计时/快捷键 hooks
   data/
-    seed.ts               # 演示题库
-    storage.ts            # schema v2 读取/规整/保存
+    seed.ts               # 演示题库与种子缓存
+    normalize.ts          # 旧数据/备份归一化
+    storage.ts            # 读取、保存、重置、占用统计
     io.ts                 # 导入导出、完整备份恢复
   store/
-    AppStore.tsx          # Provider、主题、Toast、Confirm、持久化
+    AppStore.tsx          # 数据/操作 Context、UI 反馈 Context、主题与持久化
     actions.ts            # 题库/题目/错题/练习原子更新
   components/
     ui.tsx                # Button/Chip/Progress/Modal 等基础件
@@ -150,8 +175,16 @@ src/
     QuestionEditor.tsx    # 新增/编辑题目
     DataTools.tsx         # 导入导出工具组
     BottomNav.tsx         # 移动底栏 / 桌面侧栏
-  pages/                  # 首页、题库、练习、错题、考试、我的
+  pages/
+    HomePage.tsx / WrongPage.tsx / SettingsPage.tsx
+    practice/             # 配置、作答、总结、进度轨
+    exam/                 # 组卷、作答、报告
+    banks/                # 目录、详情、导入、合并、回收站、表单
+    wrong/                # 错题卡
   styles/                 # tokens / base / components / 各页面样式 / responsive
+tests/logic.test.ts       # 纯逻辑回归测试（rolldown + node）
+scripts/ui-shot.mjs       # 无依赖 CDP 截图/脚本工具
+scripts/smoke.mjs         # 一键构建 + 全流程冒烟
 ```
 
 ## 数据与兼容
@@ -162,6 +195,8 @@ src/
 - 所有数据默认只保存在本机；导出备份后即可迁移或归档。
 
 ## 本地运行
+
+需要 Node 22+（`npm test` / `npm run smoke` 使用 Node 内置的 WebSocket 与 fetch）。
 
 ```bash
 npm install
@@ -265,15 +300,27 @@ node .agents/skills/question-bank-builder/scripts/validate-bank.mjs 你的题库
 填空等价答案：北京|北京市;鲁迅|周树人
 ```
 
-CSV 一题一行，单元格内不能换行；含逗号的字段必须用双引号包裹。普通题库文件是合并导入，完整备份 JSON 才会覆盖数据。
+CSV 一题一行；含逗号的字段必须用双引号包裹，引号内的换行也会被正确解析。普通题库文件是合并导入，完整备份 JSON 才会覆盖数据。
 
 ## 验证
 
 主要验证命令：
 
 ```bash
-npm run build
+npm test         # 20 组纯逻辑回归测试（判题/CSV/目录/回收站/统计/考试/导出）
+npm run build    # 类型检查 + 生产构建
+npm run smoke    # 自动构建 + 预览 + Chrome CDP 全流程交互冒烟（20 项）
+npm run verify   # = npm test + npm run smoke
 ```
+
+需要单独截图时：
+
+```bash
+npm run preview
+npm run ui:shot -- --url http://localhost:4173/ --out artifacts/ui/home.png --width 412 --height 915 --dpr 2 --full-page
+```
+
+截图工具支持 `--dark`、`--script <file>`（在页面内执行交互脚本）与 `--keep-open`，无需安装 Playwright / Puppeteer。`scripts/flows/` 内置练习作答、演示数据、考试报告、CSV 导入、备份恢复、回收站、无障碍与溢出检查等可复用脚本。
 
 视觉验收覆盖 320 / 412 / 1440px、日宣与夜墨、练习/考试沉浸态、桌面侧栏和空白版首次启动：
 
@@ -299,7 +346,7 @@ npm run build
 - `docs/screenshots/android-empty.png`：空白版 Android 首次启动截图
 - `docs/screenshots/home-baseline.png`：首页视觉基线
 
-交互冒烟已验证：完整练习流程与总结、练习断点续做、错题单题重刷、考试倒计时自动交卷、答题卡交卷、考试报告、CSV 导入、完整备份恢复、Excel 导出、主题切换、320px 无横向溢出、空白版首次启动。
+交互冒烟已验证：完整练习流程与总结、错题本、题库目录/详情、导入视图、主题切换、考试开始/答题卡/退出、CSV 导入、完整备份恢复、回收站恢复、无运行时错误；另覆盖 320px 无横向溢出、练习断点续做、合并撤销与 Excel 导出。
 
 Android 集成：`npm run android:debug` / `android:release` 与对应的 `:empty` 空白版命令均已在 JDK 21 + Gradle 8.11.1 下构建通过。
 
@@ -321,8 +368,9 @@ Android 集成：`npm run android:debug` / `android:release` 与对应的 `:empt
 
 欢迎提交 Issue / Pull Request。提交前请确保：
 
-- `npx tsc --noEmit --noUnusedLocals --noUnusedParameters` 通过；
-- `npm run build` 通过；
+- `npx tsc --noEmit` 通过；
+- `npm test` 与 `npm run build` 通过；
+- 涉及界面时运行 `npm run smoke` 并检查 320 / 412 / 1440px 截图；
 - 不提交任何 keystore、密码、个人路径或用户数据；
 - 新功能附带必要截图或说明。
 

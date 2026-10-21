@@ -1,4 +1,4 @@
-const CACHE_NAME = "weimo-v3";
+const CACHE_NAME = "weimo-v4";
 const MANAGED_CACHE_PREFIXES = ["shuati-wang-", "weimo-"];
 const ASSETS = [
   "/",
@@ -45,7 +45,7 @@ const networkFirst = async (request) => {
     const response = await fetch(request);
     if (response.ok && new URL(request.url).origin === self.location.origin) {
       const cache = await caches.open(CACHE_NAME);
-      cache.put(request, response.clone());
+      cache.put(request, response.clone()).catch(() => undefined);
     }
     return response;
   } catch {

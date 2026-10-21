@@ -33,6 +33,52 @@
   white-space: nowrap;
 }
 
+.catalog-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  color: var(--ink-3);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.catalog-sort select {
+  width: auto;
+  min-height: 36px;
+  padding: 0 28px 0 9px;
+  border-radius: var(--radius-sm);
+  background-position:
+    calc(100% - 14px) calc(50% + 1px),
+    calc(100% - 9px) calc(50% + 1px);
+  font-size: 11px;
+}
+
+.catalog-footnote {
+  margin-top: 18px;
+  color: var(--ink-3);
+  font-size: 10px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.filter-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 2px 4px;
+  color: var(--ink-3);
+  font-size: 10px;
+}
+
+.filter-summary button {
+  color: var(--jade);
+  font-size: 10px;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--jade) 35%, transparent);
+  text-underline-offset: 3px;
+}
+
 .bank-grid {
   display: grid;
   gap: 9px;
@@ -51,16 +97,24 @@
   transition:
     border-color var(--dur) var(--ease),
     background var(--dur) var(--ease),
-    transform 120ms var(--ease);
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
 }
 
 .bank-card:hover {
   border-color: color-mix(in srgb, var(--jade) 32%, var(--line));
   background: var(--sheet-raised);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .bank-card:active {
-  transform: scale(0.995);
+  transform: scale(0.996);
+}
+
+.bank-card:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
 .bank-card > .bank-spine {
@@ -162,6 +216,25 @@
 .type-bars span.is-empty {
   flex: 1;
   background: color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+.bank-card-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.bank-card-progress .progress {
+  flex: 1;
+}
+
+.bank-card-progress small {
+  flex: 0 0 auto;
+  color: var(--ink-3);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .bank-children-preview {

@@ -346,7 +346,7 @@ export function NoteEditor({ questionId }: { questionId: string }) {
           setDraft(event.target.value);
           setDirty(true);
         }}
-        placeholder="写下易错点、口诀或自己的解法，下次做到这题会自动带出。"
+        placeholder="写下易错点、口诀或解法，下次会自动带出。"
         aria-label="题目笔记"
         rows={4}
       />

@@ -6,10 +6,12 @@
   isolation: isolate;
   overflow: hidden;
   min-height: 352px;
-  border: 1px solid var(--line);
+  border: 1px solid color-mix(in srgb, var(--line) 92%, transparent);
   border-radius: var(--radius-2xl);
   background: var(--sheet);
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .home-hero-art {
@@ -136,11 +138,21 @@
 }
 
 .hero-copy h1 {
-  margin: 9px 0 11px;
+  margin: 10px 0 11px;
   font-size: clamp(31px, 8.6vw, 50px);
   font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: 0.06em;
+  line-height: 1.18;
+  letter-spacing: 0.055em;
+  text-shadow: 0 1px 0 color-mix(in srgb, var(--sheet) 60%, transparent);
+}
+
+.hero-copy .eyebrow {
+  padding: 4px 9px;
+  border: 1px solid var(--cinnabar-line);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--cinnabar) 6%, transparent);
+  font-size: 10px;
+  letter-spacing: 0.1em;
 }
 
 .hero-description {
@@ -155,11 +167,14 @@
   flex: 0 0 auto;
   justify-items: center;
   gap: 3px;
-  padding: 10px 10px 8px;
-  border: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+  padding: 11px 11px 9px;
+  border: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
   border-radius: 18px;
-  background: color-mix(in srgb, var(--sheet-raised) 70%, transparent);
-  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--sheet-raised) 68%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 10px 26px rgba(38, 34, 26, 0.06);
+  backdrop-filter: blur(14px) saturate(1.1);
   text-align: center;
 }
 
@@ -208,6 +223,90 @@
   font-size: 13.5px;
 }
 
+/* ---------- 今日安排 ---------- */
+.home-brief {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "copy action"
+    "goal goal";
+  align-items: center;
+  gap: 10px 12px;
+  margin: 14px 0 4px;
+  padding: 13px 14px;
+  border: 1px solid color-mix(in srgb, var(--jade) 20%, var(--line));
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(118deg, color-mix(in srgb, var(--jade) 7%, transparent), transparent 62%),
+    var(--sheet);
+  box-shadow: var(--shadow-xs);
+}
+
+.home-brief.is-review {
+  border-color: color-mix(in srgb, var(--cinnabar) 22%, var(--line));
+  background:
+    linear-gradient(118deg, color-mix(in srgb, var(--cinnabar) 6%, transparent), transparent 62%),
+    var(--sheet);
+}
+
+.home-brief.is-done {
+  border-color: color-mix(in srgb, var(--success) 24%, var(--line));
+  background:
+    linear-gradient(118deg, color-mix(in srgb, var(--success) 7%, transparent), transparent 62%),
+    var(--sheet);
+}
+
+.brief-copy {
+  grid-area: copy;
+  min-width: 0;
+}
+
+.brief-copy .eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.brief-copy strong {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  font-family: var(--font-serif);
+  font-size: 14.5px;
+  font-weight: 640;
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brief-copy small {
+  display: -webkit-box;
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--ink-3);
+  font-size: 10px;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.brief-goal {
+  grid-area: goal;
+  display: grid;
+  gap: 4px;
+}
+
+.brief-goal > span {
+  color: var(--ink-3);
+  font-size: 9.5px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.home-brief > .btn {
+  grid-area: action;
+  align-self: center;
+}
+
 .stat-strip + .section-head {
   margin-top: 26px;
 }
@@ -252,6 +351,7 @@
 }
 
 .quick-card {
+  --quick-accent: var(--jade);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -265,16 +365,31 @@
   transition:
     border-color var(--dur) var(--ease),
     background var(--dur) var(--ease),
-    transform 120ms var(--ease);
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.quick-card.tone-random {
+  --quick-accent: var(--type-blue);
+}
+
+.quick-card.tone-weighted {
+  --quick-accent: var(--type-gold);
+}
+
+.quick-card.tone-wrong {
+  --quick-accent: var(--type-rose);
 }
 
 .quick-card:hover {
-  border-color: color-mix(in srgb, var(--jade) 34%, var(--line));
+  border-color: color-mix(in srgb, var(--quick-accent) 34%, var(--line));
   background: var(--sheet-raised);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .quick-card:active {
-  transform: scale(0.99);
+  transform: scale(0.992);
 }
 
 .quick-icon {
@@ -283,9 +398,10 @@
   width: 38px;
   height: 38px;
   flex: 0 0 auto;
+  border: 1px solid color-mix(in srgb, var(--quick-accent) 12%, transparent);
   border-radius: 11px;
-  background: var(--jade-tint);
-  color: var(--jade);
+  background: color-mix(in srgb, var(--quick-accent) 9%, transparent);
+  color: var(--quick-accent);
 }
 
 .quick-icon svg {
@@ -329,7 +445,7 @@
 }
 
 .quick-card:hover .quick-arrow {
-  color: var(--jade);
+  color: var(--quick-accent);
   transform: translateX(2px);
 }
 
@@ -362,6 +478,18 @@
 }
 
 @media (min-width: 760px) {
+  .home-brief {
+    grid-template-columns: minmax(0, 1fr) minmax(160px, 240px) auto;
+    grid-template-areas: "copy goal action";
+    gap: 16px;
+    padding: 14px 18px;
+    margin-top: 16px;
+  }
+
+  .brief-copy strong {
+    font-size: 15.5px;
+  }
+
   .home-stats .stat-card {
     padding: 13px 14px 12px;
     border-radius: var(--radius-lg);
@@ -434,6 +562,28 @@
   gap: 4px;
   height: 112px;
   margin: 18px 0 6px;
+  padding-bottom: 1px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+.activity-chart-wrap {
+  position: relative;
+}
+
+.activity-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--sheet) 88%, transparent);
+  color: var(--ink-3);
+  font-size: 10px;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 .activity-col {
@@ -450,19 +600,26 @@
   width: 100%;
   max-width: 16px;
   min-height: 3px;
-  border-radius: 3px 3px 1px 1px;
-  background: color-mix(in srgb, var(--jade) 34%, transparent);
+  border-radius: 4px 4px 1px 1px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--jade) 44%, transparent), color-mix(in srgb, var(--jade) 24%, transparent));
   transition:
-    height 420ms var(--ease-out),
-    background var(--dur) var(--ease);
+    height 480ms var(--ease-out),
+    background var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.activity-col:hover .activity-bar {
+  background: linear-gradient(180deg, var(--jade), color-mix(in srgb, var(--jade) 52%, transparent));
+  transform: scaleX(1.18);
 }
 
 .activity-bar.is-today {
-  background: linear-gradient(180deg, var(--cinnabar), color-mix(in srgb, var(--cinnabar) 55%, transparent));
+  background: linear-gradient(180deg, var(--cinnabar), color-mix(in srgb, var(--cinnabar) 45%, transparent));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--cinnabar) 18%, transparent);
 }
 
 .activity-bar.is-empty {
-  background: color-mix(in srgb, var(--line) 75%, transparent);
+  background: color-mix(in srgb, var(--line) 72%, transparent);
 }
 
 .activity-col small {
@@ -581,6 +738,11 @@
   gap: 10px;
   padding: 11px 14px;
   border-bottom: 1px solid var(--line);
+  transition: background var(--dur) var(--ease);
+}
+
+.recent-row:hover {
+  background: color-mix(in srgb, var(--jade) 3%, transparent);
 }
 
 .recent-row:last-child {
@@ -659,12 +821,16 @@
   text-align: left;
   transition:
     border-color var(--dur) var(--ease),
-    background var(--dur) var(--ease);
+    background var(--dur) var(--ease),
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
 }
 
 .bank-strip:hover {
   border-color: color-mix(in srgb, var(--jade) 30%, var(--line));
   background: var(--sheet-raised);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .bank-strip > .bank-spine {

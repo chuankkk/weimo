@@ -7,12 +7,6 @@ export const localDateKey = (input: Date | string | number = new Date()) => {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 };
 
-export const startOfDay = (input: Date | string | number = new Date()) => {
-  const date = input instanceof Date ? new Date(input) : new Date(input);
-  date.setHours(0, 0, 0, 0);
-  return date;
-};
-
 export const addDays = (input: Date | string, days: number) => {
   const date = new Date(input);
   date.setDate(date.getDate() + days);

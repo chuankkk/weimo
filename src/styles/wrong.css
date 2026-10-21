@@ -35,6 +35,26 @@
   font-size: 11px;
 }
 
+.wrong-count-line > span {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.wrong-count-line em {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-3);
+  font-style: normal;
+  font-size: 9.5px;
+}
+
+.wrong-count-line em .progress {
+  width: 64px;
+}
+
 .wrong-count-line > div {
   display: flex;
   flex-wrap: wrap;
@@ -52,11 +72,22 @@
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: var(--sheet);
+  box-shadow: var(--shadow-xs);
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.wrong-card:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .wrong-card.is-due {
   border-color: color-mix(in srgb, var(--cinnabar) 34%, var(--line));
-  box-shadow: inset 3px 0 0 var(--cinnabar);
+  box-shadow:
+    inset 3px 0 0 var(--cinnabar),
+    var(--shadow-xs);
 }
 
 .wrong-card-head {

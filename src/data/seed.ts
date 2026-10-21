@@ -578,3 +578,14 @@ export const createSeedState = (): AppState => {
     settings: { ...defaultSettings }
   };
 };
+
+let cachedSeed: AppState | null = null;
+
+/**
+ * 归一化过程中会多次需要默认值，缓存一份避免重复构造演示数据。
+ * 状态更新始终是不可变写入，因此共享只读的种子对象是安全的。
+ */
+export const getSeedState = (): AppState => {
+  cachedSeed ??= createSeedState();
+  return cachedSeed;
+};

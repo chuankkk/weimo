@@ -1,38 +1,17 @@
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
-import {
-  CheckCircle2,
-  ChevronDown,
-  ChevronUp,
-  Eye,
-  FileDown,
-  RotateCcw,
-  SearchX,
-  Sparkles,
-  Target,
-  Trash2,
-  Undo2
-} from "lucide-react";
-import type { PracticeSessionState, WrongStatus } from "../types";
+import { CheckCircle2, Eye, FileDown, RotateCcw, SearchX, Sparkles, Target } from "lucide-react";
+import type { WrongStatus } from "../types";
 import { useApp } from "../store/AppStore";
 import { buildWrongRows, wrongCounts } from "../lib/stats";
-import { formatAnswer, uid } from "../lib/text";
-import { nowIso, relativeTime, isDue } from "../lib/date";
+import { isDue } from "../lib/date";
 import { weightedSampleQuestions } from "../lib/quiz";
+import { createPracticeSession } from "../lib/session";
 import { navigate } from "../lib/router";
 import { updateWrongStatus } from "../store/actions";
 import { useDocumentTitle } from "../lib/hooks";
-import {
-  Button,
-  EmptyState,
-  IconButton,
-  ProgressBar,
-  SearchField,
-  Segmented,
-  StatCard,
-  TypeBadge
-} from "../components/ui";
-import { cn } from "../lib/text";
+import { Button, EmptyState, PageHeader, ProgressBar, SearchField, Segmented, StatCard } from "../components/ui";
 import { WrongBookExport } from "../components/WrongBookExport";
+import { WrongCard } from "./wrong/WrongCard";
 
 const statusTabs: { value: WrongStatus; label: string }[] = [
   { value: "active", label: "待复习" },
@@ -74,7 +53,9 @@ export function WrongPage() {
         )
       : list;
     return [...filtered].sort(
-      (a, b) => Number(isDue(b.wrong.nextReviewAt)) - Number(isDue(a.wrong.nextReviewAt)) || b.wrong.lastWrongAt.localeCompare(a.wrong.lastWrongAt)
+      (a, b) =>
+        Number(isDue(b.wrong.nextReviewAt)) - Number(isDue(a.wrong.nextReviewAt)) ||
+        b.wrong.lastWrongAt.localeCompare(a.wrong.lastWrongAt)
     );
   }, [state, catalog, bankId, status, deferredKeyword]);
 
@@ -112,24 +93,13 @@ export function WrongPage() {
       });
       if (!accepted) return;
     }
-    const startedAt = nowIso();
-    const session: PracticeSessionState = {
-      id: uid("practice"),
-      mode: "wrong",
-      questionIds,
-      currentIndex: 0,
-      answers: {},
-      submitted: {},
-      startedAt,
-      questionStartedAt: startedAt
-    };
-    update((current) => ({ ...current, practiceSession: session }));
+    update((current) => ({ ...current, practiceSession: createPracticeSession(questionIds, "wrong") }));
     navigate("practice", { run: "1" });
   };
 
   const rematch = (ids?: string[]) => {
     if (ids) {
-      startSession(ids);
+      void startSession(ids);
       return;
     }
     const source = rows.map((row) => row.question);
@@ -146,7 +116,14 @@ export function WrongPage() {
         knowledgeStrength: state.settings.weightedKnowledgeStrength
       }
     });
-    startSession(picked.map((question) => question.id));
+    void startSession(picked.map((question) => question.id));
+  };
+
+  const startTodayReview = () => {
+    const due = buildWrongRows(state, catalog, bankId === "all" ? undefined : bankId)
+      .filter((row) => row.wrong.status === "active" && isDue(row.wrong.nextReviewAt))
+      .slice(0, 50);
+    void startSession(due.map((row) => row.question.id));
   };
 
   const changeStatus = async (questionId: string, next: WrongStatus) => {
@@ -165,19 +142,24 @@ export function WrongPage() {
     });
   };
 
-  const completion = counts.active + counts.mastered + counts.ignored
-    ? counts.mastered / (counts.active + counts.mastered + counts.ignored)
-    : 0;
+  const totalWrong = counts.active + counts.mastered + counts.ignored;
+  const completion = totalWrong ? counts.mastered / totalWrong : 0;
 
   return (
     <section className="page wrong-page">
-      <div className="page-head">
-        <div className="page-head-copy">
-          <p className="eyebrow">错题本</p>
-          <h1>把错处，练成底气</h1>
-          <p className="page-head-sub">按题库归档，结合掌握度与复习时间，集中攻克真正薄弱的地方。</p>
-        </div>
-      </div>
+      <PageHeader
+        className="page-head-stack"
+        eyebrow="错题本"
+        title="把错处，练成底气"
+        subtitle="按题库归档，结合掌握度与复习时间，集中攻克真正薄弱的地方。"
+        actions={
+          counts.due ? (
+            <Button icon={<Sparkles />} onClick={startTodayReview}>
+              今日复习 · {counts.due}
+            </Button>
+          ) : undefined
+        }
+      />
 
       <div className="stat-strip three">
         <StatCard label="待复习" value={counts.active} unit="题" hint={`今天到期 ${counts.due} 题`} tone="rose" icon={<Target />} />
@@ -209,6 +191,12 @@ export function WrongPage() {
       <div className="wrong-count-line">
         <span>
           {statusTabs.find((tab) => tab.value === status)?.label} · {rows.length} 题
+          {totalWrong ? (
+            <em>
+              <ProgressBar value={completion} size="sm" tone="jade" label="错题掌握率" />
+              掌握率 {Math.round(completion * 100)}%
+            </em>
+          ) : null}
         </span>
         <div>
           <Button variant="quiet" size="sm" icon={<FileDown />} onClick={() => setExportOpen(true)}>
@@ -230,89 +218,16 @@ export function WrongPage() {
 
       {rows.length ? (
         <div className="wrong-list">
-          {visibleRows.map(({ wrong, question }) => {
-            const isOpen = expanded.has(question.id);
-            const due = wrong.status === "active" && isDue(wrong.nextReviewAt);
-            const bankPath = catalog.bankPath(question.bankId).map((bank) => bank.name).join(" / ");
-            return (
-              <article className={cn("wrong-card", due && "is-due")} key={question.id}>
-                <div className="wrong-card-head">
-                  <div className="wrong-meta">
-                    <TypeBadge type={question.type} />
-                    <span>{bankPath}</span>
-                    {due ? <span className="due-badge">今日复习</span> : null}
-                  </div>
-                  <span className="wrong-mastery" title={`掌握度 ${wrong.masteryLevel}/5`}>
-                    {[1, 2, 3, 4, 5].map((level) => (
-                      <i key={level} className={level <= wrong.masteryLevel ? "on" : ""} />
-                    ))}
-                  </span>
-                </div>
-
-                <h3>{question.stem}</h3>
-
-                <div className="wrong-stats">
-                  <span>答错 {wrong.wrongCount} 次</span>
-                  <span>连续答对 {wrong.correctAfterWrongCount} 次</span>
-                  <span>最近 {relativeTime(wrong.lastWrongAt)}</span>
-                  <span>掌握度 {wrong.masteryLevel} / 5</span>
-                </div>
-
-                <div className="wrong-progress">
-                  <ProgressBar value={wrong.masteryLevel / 5} tone="jade" size="sm" label="掌握度" />
-                </div>
-
-                {isOpen ? (
-                  <div className="wrong-answer">
-                    <div className="wrong-answer-head">
-                      <strong>正确答案</strong>
-                      <span>{formatAnswer(question)}</span>
-                    </div>
-                    {question.options.length ? (
-                      <ul className="wrong-options">
-                        {question.options.map((option) => (
-                          <li key={option.key} className={question.answer.includes(option.key) ? "is-correct" : ""}>
-                            <b>{option.key}</b>
-                            {option.text}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                    <p>
-                      <b>解析：</b>
-                      {question.explanation || "暂无解析"}
-                    </p>
-                    {question.knowledgePoints.length ? (
-                      <p className="wrong-points">知识点：{question.knowledgePoints.join(" · ")}</p>
-                    ) : null}
-                  </div>
-                ) : null}
-
-                <div className="wrong-actions">
-                  <Button variant="ghost" size="sm" icon={isOpen ? <ChevronUp /> : <ChevronDown />} onClick={() => toggleExpanded(question.id)}>
-                    {isOpen ? "收起答案" : "查看答案"}
-                  </Button>
-                  <Button variant="secondary" size="sm" icon={<RotateCcw />} onClick={() => rematch([question.id])}>
-                    重刷此题
-                  </Button>
-                  {wrong.status === "active" ? (
-                    <>
-                      <Button variant="ghost" size="sm" icon={<CheckCircle2 />} onClick={() => void changeStatus(question.id, "mastered")}>
-                        标记掌握
-                      </Button>
-                      <IconButton label="忽略该错题" size="sm" variant="plain" onClick={() => void changeStatus(question.id, "ignored")}>
-                        <Trash2 />
-                      </IconButton>
-                    </>
-                  ) : (
-                    <Button variant="ghost" size="sm" icon={<Undo2 />} onClick={() => void changeStatus(question.id, "active")}>
-                      恢复待复习
-                    </Button>
-                  )}
-                </div>
-              </article>
-            );
-          })}
+          {visibleRows.map((row) => (
+            <WrongCard
+              key={row.question.id}
+              row={row}
+              expanded={expanded.has(row.question.id)}
+              onToggle={() => toggleExpanded(row.question.id)}
+              onRematch={() => rematch([row.question.id])}
+              onStatus={(next) => void changeStatus(row.question.id, next)}
+            />
+          ))}
         </div>
       ) : (
         <EmptyState

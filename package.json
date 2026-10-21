@@ -1,13 +1,20 @@
 {
   "name": "weimo",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
     "build:empty": "tsc && vite build --mode empty",
     "preview": "vite preview --host 0.0.0.0",
+    "test": "rolldown tests/logic.test.ts --format esm --file .tmp/logic.test.mjs && node .tmp/logic.test.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "verify": "npm test && npm run smoke",
+    "ui:shot": "node scripts/ui-shot.mjs",
     "android:sync": "npm run build && cap sync android",
     "android:sync:empty": "npm run build:empty && cap sync android",
     "android:open": "npm run android:sync && cap open android",

@@ -1,4 +1,13 @@
-import { useEffect, useRef, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ButtonHTMLAttributes,
+  type InputHTMLAttributes,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type ReactNode,
+  type TextareaHTMLAttributes
+} from "react";
 import { ArrowUp, Search, X } from "lucide-react";
 import type { QuestionType } from "../types";
 import { DIFFICULTY_LABEL, typeLabel, typeTone } from "../lib/constants";
@@ -46,6 +55,7 @@ export function Button({
       type={type}
       className={buttonClass({ variant, size, block, className })}
       disabled={disabled || loading}
+      aria-busy={loading || undefined}
       {...rest}
     >
       {loading ? <Spinner size={16} /> : icon}
@@ -125,9 +135,11 @@ export function SectionNav({ items, label = "页内快速跳转" }: { items: Sec
     const observer = new IntersectionObserver(
       (entries) => {
         if (Date.now() < lockUntil.current) return;
-        const visible = entries.filter((entry) => entry.isIntersecting);
-        const last = visible[visible.length - 1];
-        if (last) setActive((last.target as HTMLElement).id);
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        const first = visible[0];
+        if (first) setActive((first.target as HTMLElement).id);
       },
       { rootMargin: "-92px 0px -60% 0px", threshold: 0 }
     );
@@ -186,11 +198,12 @@ export interface PageHeaderProps {
   subtitle?: string;
   actions?: ReactNode;
   back?: ReactNode;
+  className?: string;
 }
 
-export function PageHeader({ eyebrow, title, subtitle, actions, back }: PageHeaderProps) {
+export function PageHeader({ eyebrow, title, subtitle, actions, back, className }: PageHeaderProps) {
   return (
-    <header className="page-head">
+    <header className={cn("page-head", className)}>
       {back ? <div className="page-head-back">{back}</div> : null}
       <div className="page-head-copy">
         {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
@@ -352,10 +365,19 @@ export function SearchField({
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Escape" && value) {
+            event.preventDefault();
+            onChange("");
+            onClear?.();
+          }
+        }}
         placeholder={placeholder}
         aria-label={ariaLabel}
         type="search"
         enterKeyHint="search"
+        autoComplete="off"
+        spellCheck={false}
       />
       {value ? (
         <button
@@ -479,6 +501,18 @@ export function Segmented<T extends string>({
   onChange: (value: T) => void;
   ariaLabel: string;
 }) {
+  const move = (event: ReactKeyboardEvent<HTMLButtonElement>, direction: 1 | -1) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const index = options.findIndex((option) => option.value === value);
+    const next = options[(index + direction + options.length) % options.length];
+    if (next) {
+      onChange(next.value);
+      const buttons = event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(".segment");
+      buttons?.[options.indexOf(next)]?.focus();
+    }
+  };
+
   return (
     <div className="segmented" role="tablist" aria-label={ariaLabel}>
       {options.map((option) => (
@@ -487,8 +521,10 @@ export function Segmented<T extends string>({
           type="button"
           role="tab"
           aria-selected={value === option.value}
+          tabIndex={value === option.value ? 0 : -1}
           className={cn("segment", value === option.value && "is-active")}
           onClick={() => onChange(option.value)}
+          onKeyDown={(event) => move(event, event.key === "ArrowRight" ? 1 : -1)}
         >
           {option.icon}
           <span>{option.label}</span>

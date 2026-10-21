@@ -918,3 +918,60 @@
   font-weight: 500;
 }
 
+
+/* ---------- v2.2 视觉强化 ---------- */
+.strategy-card {
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.strategy-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.exam-timer.is-urgent {
+  animation: urgent-pulse 1.8s var(--ease) infinite;
+}
+
+@keyframes urgent-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--cinnabar) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--cinnabar) 16%, transparent);
+  }
+}
+
+.history-row {
+  transition: background var(--dur) var(--ease);
+}
+
+.sheet-cell {
+  transition:
+    background var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+
+.sheet-cell:active {
+  transform: scale(0.94);
+}
+
+.report-row.is-unanswered .review-mark {
+  color: var(--ink-4);
+}
+
+.report-row .review-index.is-unanswered {
+  color: var(--ink-4);
+  border-color: var(--line);
+  background: color-mix(in srgb, var(--line) 20%, transparent);
+}
+
+.report-row.is-unanswered .report-row-score {
+  color: var(--ink-3);
+}

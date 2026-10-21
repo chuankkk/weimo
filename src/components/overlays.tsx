@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AlertTriangle, X } from "lucide-react";
-import { useApp } from "../store/AppStore";
+import { useUi } from "../store/AppStore";
 import { Button, IconButton } from "./ui";
 import { cn } from "../lib/text";
 
@@ -20,6 +20,9 @@ export interface ModalProps {
 const focusableSelector =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/** 多层弹窗（例如导出预览上再确认）共用一个滚动锁与 inert 状态。 */
+let openModalCount = 0;
+
 export function Modal({
   open,
   onClose,
@@ -32,6 +35,7 @@ export function Modal({
   dismissible = true
 }: ModalProps) {
   const titleId = useId();
+  const descriptionId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
@@ -39,7 +43,10 @@ export function Modal({
   useEffect(() => {
     if (!open) return;
     const previous = document.activeElement as HTMLElement | null;
+    openModalCount += 1;
     document.body.classList.add("has-modal");
+    const appRoot = document.getElementById("root");
+    if (appRoot) appRoot.inert = true;
     const timer = window.setTimeout(() => {
       const preferred = dialogRef.current?.querySelector<HTMLElement>("[data-autofocus], [autofocus]");
       const first = dialogRef.current?.querySelector<HTMLElement>(focusableSelector);
@@ -76,7 +83,11 @@ export function Modal({
     return () => {
       window.clearTimeout(timer);
       document.removeEventListener("keydown", handleKey);
-      document.body.classList.remove("has-modal");
+      openModalCount = Math.max(0, openModalCount - 1);
+      if (!openModalCount) {
+        document.body.classList.remove("has-modal");
+        if (appRoot) appRoot.inert = false;
+      }
       previous?.focus?.();
     };
   }, [open, dismissible]);
@@ -95,6 +106,7 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        aria-describedby={description ? descriptionId : undefined}
         ref={dialogRef}
         tabIndex={-1}
       >
@@ -102,7 +114,7 @@ export function Modal({
         <header className="modal-head">
           <div>
             <h2 id={titleId}>{title}</h2>
-            {description ? <p>{description}</p> : null}
+            {description ? <p id={descriptionId}>{description}</p> : null}
           </div>
           {dismissible ? (
             <IconButton label="关闭" variant="plain" size="sm" onClick={onClose}>
@@ -119,7 +131,7 @@ export function Modal({
 }
 
 export function ConfirmHost() {
-  const { confirmState, resolveConfirm } = useApp();
+  const { confirmState, resolveConfirm } = useUi();
   const danger = confirmState?.tone === "danger";
   return (
     <Modal
@@ -158,7 +170,7 @@ export function ConfirmHost() {
 }
 
 export function ToastViewport() {
-  const { toasts, dismissToast } = useApp();
+  const { toasts, dismissToast } = useUi();
   if (!toasts.length) return null;
   return createPortal(
     <div className="toast-stack" role="status" aria-live="polite" aria-atomic="false">
@@ -169,6 +181,7 @@ export function ToastViewport() {
           <button type="button" className="toast-close" aria-label="关闭提示" onClick={() => dismissToast(toast.id)}>
             <X />
           </button>
+          <span className="toast-progress" style={{ animationDuration: `${toast.duration}ms` }} aria-hidden="true" />
         </div>
       ))}
     </div>,
