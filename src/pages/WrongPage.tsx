@@ -4,6 +4,7 @@ import {
   ChevronDown,
   ChevronUp,
   Eye,
+  FileDown,
   RotateCcw,
   SearchX,
   Sparkles,
@@ -31,6 +32,7 @@ import {
   TypeBadge
 } from "../components/ui";
 import { cn } from "../lib/text";
+import { WrongBookExport } from "../components/WrongBookExport";
 
 const statusTabs: { value: WrongStatus; label: string }[] = [
   { value: "active", label: "待复习" },
@@ -46,6 +48,7 @@ export function WrongPage() {
   const [keyword, setKeyword] = useState("");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [visibleCount, setVisibleCount] = useState(20);
+  const [exportOpen, setExportOpen] = useState(false);
   const deferredKeyword = useDeferredValue(keyword);
 
   useEffect(() => {
@@ -208,6 +211,9 @@ export function WrongPage() {
           {statusTabs.find((tab) => tab.value === status)?.label} · {rows.length} 题
         </span>
         <div>
+          <Button variant="quiet" size="sm" icon={<FileDown />} onClick={() => setExportOpen(true)}>
+            导出错题本
+          </Button>
           <Button variant="ghost" size="sm" icon={<RotateCcw />} onClick={() => rematch()} disabled={!rows.length}>
             重刷筛选结果
           </Button>
@@ -346,6 +352,11 @@ export function WrongPage() {
       ) : rows.length > 20 ? (
         <p className="load-more-done">已显示全部 {rows.length} 题</p>
       ) : null}
+      <WrongBookExport
+        open={exportOpen}
+        onClose={() => setExportOpen(false)}
+        bankId={bankId === "all" ? undefined : bankId}
+      />
     </section>
   );
 }

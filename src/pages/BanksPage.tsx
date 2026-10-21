@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
+  FileDown,
   FilePlus2,
   FolderOpen,
   Layers3,
@@ -36,6 +37,7 @@ import { relativeTime } from "../lib/date";
 import { DataTools } from "../components/DataTools";
 import { Modal } from "../components/overlays";
 import { QuestionEditor } from "../components/QuestionEditor";
+import { WrongBookExport } from "../components/WrongBookExport";
 import {
   Button,
   Chip,
@@ -501,6 +503,7 @@ function BankDetail({
   const { state, catalog, update, toast, confirm } = useApp();
   const children = catalog.childrenOf(bank.id);
   const [scopeId, setScopeId] = useState(bank.id);
+  const [exportOpen, setExportOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<QuestionType | "all">("all");
   const [page, setPage] = useState(1);
@@ -585,6 +588,9 @@ function BankDetail({
           <p>{bank.description || "暂无描述"}</p>
         </div>
         <div className="detail-head-actions">
+          <IconButton label="导出错题本" onClick={() => setExportOpen(true)}>
+            <FileDown />
+          </IconButton>
           <IconButton label="编辑题库" onClick={onEditBank}>
             <Pencil />
           </IconButton>
@@ -778,6 +784,7 @@ function BankDetail({
           </Button>
         </div>
       )}
+      <WrongBookExport open={exportOpen} onClose={() => setExportOpen(false)} bankId={bank.id} />
     </section>
   );
 }

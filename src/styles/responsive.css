@@ -941,6 +941,19 @@
     font-size: 9px;
   }
 
+  .bank-detail-page .detail-head {
+    flex-wrap: wrap;
+  }
+
+  .bank-detail-page .detail-head-copy {
+    flex-basis: calc(100% - 52px);
+  }
+
+  .bank-detail-page .detail-head-actions {
+    width: 100%;
+    padding-left: 52px;
+  }
+
   .banks-page .page-head {
     flex-direction: column;
     align-items: flex-start;
@@ -1030,5 +1043,6 @@
     transition-duration: 0.01ms !important;
   }
 }
+
 
 
