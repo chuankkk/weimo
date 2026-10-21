@@ -869,6 +869,7 @@ button.chip:hover {
 .segment svg {
   width: 15px;
   height: 15px;
+  flex: 0 0 auto;
 }
 
 .segment b {

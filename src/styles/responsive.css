@@ -924,6 +924,23 @@
     font-size: 9px;
   }
 
+  .bank-subnav .segment {
+    gap: 4px;
+    padding: 0 7px;
+    font-size: 11px;
+  }
+
+  .bank-subnav .segment svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .bank-subnav .segment b {
+    min-width: 16px;
+    height: 15px;
+    font-size: 9px;
+  }
+
   .banks-page .page-head {
     flex-direction: column;
     align-items: flex-start;
@@ -1013,4 +1030,5 @@
     transition-duration: 0.01ms !important;
   }
 }
+
 
